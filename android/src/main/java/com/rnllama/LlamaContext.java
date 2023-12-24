@@ -23,6 +23,7 @@ public class LlamaContext {
 
   private int id;
   private ReactApplicationContext reactContext;
+  static public ReactApplicationContext sharedContext = null ;
   private long context;
   private int jobId = -1;
   private DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
@@ -34,6 +35,7 @@ public class LlamaContext {
     if (!params.hasKey("model")) {
       throw new IllegalArgumentException("Missing required parameter: model");
     }
+    Log.e(NAME, "SomeOneHas Init COntext");
     this.id = id;
     this.context = initContext(
       // String model,
@@ -45,7 +47,7 @@ public class LlamaContext {
       // int n_batch,
       params.hasKey("n_batch") ? params.getInt("n_batch") : 512,
       // int n_threads,
-      params.hasKey("n_threads") ? params.getInt("n_threads") : 0,
+      params.hasKey("n_threads") ? params.getInt("n_threads") : 4,
       // int n_gpu_layers, // TODO: Support this
       params.hasKey("n_gpu_layers") ? params.getInt("n_gpu_layers") : 0,
       // boolean use_mlock,
@@ -64,7 +66,16 @@ public class LlamaContext {
       params.hasKey("rope_freq_scale") ? (float) params.getDouble("rope_freq_scale") : 0.0f
     );
     this.reactContext = reactContext;
-    eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+    if (sharedContext == null && reactContext != null){
+      sharedContext = reactContext ;
+    }
+    if (reactContext == null){
+      this.reactContext = sharedContext;
+      Log.e(NAME, "has set context!") ;
+    }
+    if (reactContext != null) {
+      eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+    }
   }
 
   public long getContext() {
