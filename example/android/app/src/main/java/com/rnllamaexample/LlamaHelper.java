@@ -1,5 +1,7 @@
 package com.rnllamaexample;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -13,10 +15,10 @@ public class LlamaHelper {
   static public LlamaHelper shared;
 
   LlamaContext lctx ;
-  static public void init() {
+  static public void init(Context c) {
+    LlamaContext.ctx = c;
     if (shared == null){
       shared = new LlamaHelper();
-      shared.init() ;
     }
   }
 
@@ -55,11 +57,12 @@ public class LlamaHelper {
       return false;
     }
     WritableMap data = Arguments.createMap();
+    line += ", answer shortly. ";
     Log.e(TAG, "talk:" + line);
-    data.putString("prompt", toUtf8(line));
+    data.putString(toUtf8("prompt"), toUtf8(line));
     lctx.completion(data);
+
     return true ;
   }
-
 
 }

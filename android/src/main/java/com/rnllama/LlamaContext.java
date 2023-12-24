@@ -8,6 +8,9 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.os.Build;
 import android.content.res.AssetManager;
@@ -20,13 +23,17 @@ import java.io.IOException;
 
 public class LlamaContext {
   public static final String NAME = "RNLlamaContext";
+  private static final String NOTIFI_PART = "com.rnllama.send";
 
   private int id;
   private ReactApplicationContext reactContext;
   static public ReactApplicationContext sharedContext = null ;
+  static public Context ctx ;// ANdroid default ctx
   private long context;
   private int jobId = -1;
   private DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
+
+
 
   public LlamaContext(int id, ReactApplicationContext reactContext, ReadableMap params) {
     if (LlamaContext.isArm64V8a() == false && LlamaContext.isX86_64() == false) {
@@ -86,6 +93,7 @@ public class LlamaContext {
     WritableMap event = Arguments.createMap();
     event.putInt("contextId", LlamaContext.this.id);
     event.putMap("tokenResult", tokenResult);
+
     if (eventEmitter != null) {
       eventEmitter.emit("@RNLlama_onToken", event);
     }
@@ -101,6 +109,10 @@ public class LlamaContext {
     }
 
     void onPartialCompletion(WritableMap tokenResult) {
+      Log.e("@@", "@@ TokenResult:" + tokenResult.toString());
+
+      notifyPartString(tokenResult.getString("token"));
+
       if (!emitNeeded) return;
       context.emitPartialCompletion(tokenResult);
     }
@@ -197,9 +209,19 @@ public class LlamaContext {
       // PartialCompletionCallback partial_completion_callback
       new PartialCompletionCallback(
         this,
-        params.hasKey("emit_partial_completion") ? params.getBoolean("emit_partial_completion") : false
+        params.hasKey("emit_partial_completion") ? params.getBoolean("emit_partial_completion") : true
       )
     );
+  }
+
+  public static void notifyPartString(String part){
+    Intent intent = new Intent(NOTIFI_PART);    //action: "msg"
+    intent.putExtra("token", part);
+
+    if (ctx != null){
+      Log.e("@@", "action has send:" + part);
+      ctx.sendBroadcast(intent);
+    }
   }
 
   public void stopCompletion() {

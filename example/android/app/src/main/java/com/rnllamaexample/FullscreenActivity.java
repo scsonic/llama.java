@@ -5,6 +5,11 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +41,8 @@ public class FullscreenActivity extends AppCompatActivity {
     TextView tvResponse ;
     EditText etInput ;
 
+    BroadcastReceiver receiver ;
+
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -61,13 +68,9 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     public void onClick(View v) {
       String text = etInput.getText().toString();
-      boolean ret = LlamaHelper.shared.talk(text);
-      if ( ret){
-        etInput.getText().clear();
-      }
-      else {
-        Toast.makeText(FullscreenActivity.this, "Please wait", Toast.LENGTH_SHORT);
-      }
+      //boolean ret = LlamaHelper.shared.talk(text);
+      TalkTask task = new TalkTask();
+      task.execute(text);
     }
   };
 
@@ -82,18 +85,74 @@ public class FullscreenActivity extends AppCompatActivity {
 
        btnSubmit.setOnClickListener(onSubmit);
 
-    btnSubmit.setEnabled(false);
-       new Thread(){
-         @Override
-         public void run() {
-           super.run();
-           LlamaHelper.init();
-           Log.e(TAG, "Module Init Success") ;
-           mHandler.post(()->{
-             btnSubmit.setEnabled(true);
-           });
-         }
-       }.start();
 
+      btnSubmit.setEnabled(false);
+         new Thread(){
+           @Override
+           public void run() {
+             super.run();
+             LlamaHelper.init(FullscreenActivity.this);
+             Log.e(TAG, "Module Init Success") ;
+             mHandler.post(()->{
+               btnSubmit.setEnabled(true);
+             });
+           }
+         }.start();
+
+//         receiver = new LlamaReceiver();
+//          IntentFilter reg = new IntentFilter("com.rnllama.send");
+//         registerReceiver(receiver, reg);
+
+    receiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        if (intent.hasExtra("token")) {
+          Log.e(TAG, "On Receive v2:" + intent.getStringExtra("token"));
+        }
+      }
+    };
+      IntentFilter reg = new IntentFilter("com.rnllama.send");
+         registerReceiver(receiver, reg);
+
+      }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    //unregisterReceiver(receiver);
+  }
+
+  enum State {
+    TALKING, INIT, END
+  }
+  public void toggleState(State state){
+    if (state == State.TALKING){
+      btnSubmit.setEnabled(false);
     }
+    else if (state == State.END){
+      btnSubmit.setEnabled(true);
+    }
+  }
+
+  class TalkTask extends AsyncTask<String, Void, Void> {
+
+    boolean ret = false ;
+    @Override
+    protected void onPreExecute() {
+      super.onPreExecute();
+      toggleState(State.TALKING);
+    }
+
+    protected Void doInBackground(String... lines) {
+
+      ret = LlamaHelper.shared.talk(lines[0]);
+      return null;
+    }
+    protected void onPostExecute(Long result) {
+      toggleState(State.END);
+      if ( ret == true){
+        etInput.getText().clear();
+      }
+    }
+  }
 }
