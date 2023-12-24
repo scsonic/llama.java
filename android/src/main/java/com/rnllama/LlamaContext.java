@@ -86,7 +86,9 @@ public class LlamaContext {
     WritableMap event = Arguments.createMap();
     event.putInt("contextId", LlamaContext.this.id);
     event.putMap("tokenResult", tokenResult);
-    eventEmitter.emit("@RNLlama_onToken", event);
+    if (eventEmitter != null) {
+      eventEmitter.emit("@RNLlama_onToken", event);
+    }
   }
 
   private static class PartialCompletionCallback {
@@ -161,7 +163,7 @@ public class LlamaContext {
       // int penalty_last_n,
       params.hasKey("penalty_last_n") ? params.getInt("penalty_last_n") : 64,
       // float penalty_repeat,
-      params.hasKey("penalty_repeat") ? (float) params.getDouble("penalty_repeat") : 1.10f,
+      params.hasKey("penalty_repeat") ? (float) params.getDouble("penalty_repeat") : 1.30f,
       // float penalty_freq,
       params.hasKey("penalty_freq") ? (float) params.getDouble("penalty_freq") : 0.00f,
       // float penalty_present,
