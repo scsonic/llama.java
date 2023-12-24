@@ -13,14 +13,16 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.rnllama.LlamaContext;
-import com.rnllamaexample.databinding.ActivityFullscreenBinding;
-
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -29,199 +31,69 @@ import java.nio.charset.StandardCharsets;
  */
 public class FullscreenActivity extends AppCompatActivity {
   static public String TAG = "FSA" ;
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
+    private final Handler mHandler = new Handler(Looper.myLooper());
+    Button btnSubmit ;
+    TextView tvResponse ;
+    EditText etInput ;
 
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-
-    /**
-     * Some older devices needs a small delay between UI widget updates
-     * and a change of the status and navigation bar.
-     */
-    private static final int UI_ANIMATION_DELAY = 300;
-    private final Handler mHideHandler = new Handler(Looper.myLooper());
-    private View mContentView;
-
-    LlamaContext lctx ;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
             // Delayed removal of status and navigation bar
-            if (Build.VERSION.SDK_INT >= 30) {
-                mContentView.getWindowInsetsController().hide(
-                        WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-            } else {
-                // Note that some of these constants are new as of API 16 (Jelly Bean)
-                // and API 19 (KitKat). It is safe to use them, as they are inlined
-                // at compile-time and do nothing on earlier devices.
-                mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-            }
+//            if (Build.VERSION.SDK_INT >= 30) {
+//                getWindowInsetsController().hide(
+//                        WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+//            } else {
+//                // Note that some of these constants are new as of API 16 (Jelly Bean)
+//                // and API 19 (KitKat). It is safe to use them, as they are inlined
+//                // at compile-time and do nothing on earlier devices.
+//                mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+//                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+//            }
         }
     };
-    private View mControlsView;
-    private final Runnable mShowPart2Runnable = new Runnable() {
-        @Override
-        public void run() {
-            // Delayed display of UI elements
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
-            mControlsView.setVisibility(View.VISIBLE);
-        }
-    };
-    private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-
-
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (AUTO_HIDE) {
-                        delayedHide(AUTO_HIDE_DELAY_MILLIS);
-                    }
-                    break;
-                case MotionEvent.ACTION_UP:
-                    view.performClick();
-                    break;
-                default:
-                    break;
-            }
-            return false;
-        }
-    };
-    private ActivityFullscreenBinding binding;
-
+  private View.OnClickListener onSubmit = new View.OnClickListener() {
     @Override
+    public void onClick(View v) {
+      String text = etInput.getText().toString();
+      boolean ret = LlamaHelper.shared.talk(text);
+      if ( ret){
+        etInput.getText().clear();
+      }
+      else {
+        Toast.makeText(FullscreenActivity.this, "Please wait", Toast.LENGTH_SHORT);
+      }
+    }
+  };
+
+  @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityFullscreenBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_fullscreen);
+       btnSubmit  = findViewById(R.id.btnSubmit);
+       tvResponse = findViewById(R.id.tvResponse);
+       etInput = findViewById(R.id.etInput);
 
-        mVisible = true;
-        mControlsView = binding.fullscreenContentControls;
-        mContentView = binding.fullscreenContent;
+       btnSubmit.setOnClickListener(onSubmit);
 
-        // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggle();
-            }
-        });
+    btnSubmit.setEnabled(false);
+       new Thread(){
+         @Override
+         public void run() {
+           super.run();
+           LlamaHelper.init();
+           Log.e(TAG, "Module Init Success") ;
+           mHandler.post(()->{
+             btnSubmit.setEnabled(true);
+           });
+         }
+       }.start();
 
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        //binding.dummyButton.setOnTouchListener(mDelayHideTouchListener);
-
-      binding.dummyButton.setOnClickListener((v)->{
-
-        if (lctx == null) {
-          WritableMap params = Arguments.createMap();
-          params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
-          lctx = new LlamaContext(54321, null, params);
-        }
-        if ( lctx != null){
-          WritableMap data = Arguments.createMap();
-          int a = (int) (System.currentTimeMillis()*1234) % 100;
-          int b = (int) (System.currentTimeMillis()*4321) % 100;
-          String p = String.format("%d + %d = ?", a, b);
-
-          Log.e(TAG, p);
-          data.putString("prompt", toUtf8(p));
-          lctx.completion(data);
-        }
-
-
-      });
-    }
-
-    public String toUtf8(String input){
-      byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
-      return new String(bytes, StandardCharsets.UTF_8);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        delayedHide(100);
-    }
-
-    private void toggle() {
-        if (mVisible) {
-            hide();
-        } else {
-            show();
-        }
-    }
-
-    private void hide() {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        mControlsView.setVisibility(View.GONE);
-        mVisible = false;
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    private void show() {
-        // Show the system bar
-        if (Build.VERSION.SDK_INT >= 30) {
-            mContentView.getWindowInsetsController().show(
-                    WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-        } else {
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        }
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    }
-
-    /**
-     * Schedules a call to hide() in delay milliseconds, canceling any
-     * previously scheduled calls.
-     */
-    private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 }
