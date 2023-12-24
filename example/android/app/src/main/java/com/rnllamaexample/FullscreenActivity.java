@@ -69,6 +69,15 @@ public class FullscreenActivity extends AppCompatActivity {
     public void onClick(View v) {
       String text = etInput.getText().toString();
       //boolean ret = LlamaHelper.shared.talk(text);
+
+      if (BuildConfig.DEBUG){
+        if (text.length() == 0){
+          int a = (int)(System.currentTimeMillis() % 10);
+          int b = (int)(System.currentTimeMillis() % 10);
+          text = String.format("%d + %d = ", a, b);
+          etInput.setText(text, null);
+        }
+      }
       TalkTask task = new TalkTask();
       task.execute(text);
     }
@@ -108,6 +117,8 @@ public class FullscreenActivity extends AppCompatActivity {
       public void onReceive(Context context, Intent intent) {
         if (intent.hasExtra("token")) {
           Log.e(TAG, "On Receive v2:" + intent.getStringExtra("token"));
+          String text = intent.getStringExtra("token");
+          tvResponse.setText(tvResponse.getText() + text);
         }
       }
     };
@@ -140,6 +151,7 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
+      tvResponse.setText("(Processing)");
       toggleState(State.TALKING);
     }
 
