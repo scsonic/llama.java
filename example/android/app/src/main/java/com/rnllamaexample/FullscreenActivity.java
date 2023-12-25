@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +44,8 @@ public class FullscreenActivity extends AppCompatActivity {
     EditText etInput ;
 
     BroadcastReceiver receiver ;
+
+    private AvatarPlayer mAvatarPlayer;
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -86,8 +90,13 @@ public class FullscreenActivity extends AppCompatActivity {
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Common.act = this;
         setContentView(R.layout.activity_fullscreen);
+
+        FrameLayout avatarLayout = findViewById(R.id.AvatarLayout);
+        mAvatarPlayer = new AvatarPlayer(this, avatarLayout);
+
+
        btnSubmit  = findViewById(R.id.btnSubmit);
        tvResponse = findViewById(R.id.tvResponse);
        etInput = findViewById(R.id.etInput);
@@ -129,8 +138,33 @@ public class FullscreenActivity extends AppCompatActivity {
 
   @Override
   protected void onDestroy() {
+    mAvatarPlayer.destroy();
     super.onDestroy();
     //unregisterReceiver(receiver);
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    mAvatarPlayer.pause();
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mAvatarPlayer.resume();
+  }
+
+  @Override
+  public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    mAvatarPlayer.windowFocusChanged(hasFocus);
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    mAvatarPlayer.configurationChanged(newConfig);
   }
 
   enum State {
@@ -151,16 +185,20 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
+      Log.e(TAG, "Task Start");
       tvResponse.setText("(Processing)");
       toggleState(State.TALKING);
     }
 
     protected Void doInBackground(String... lines) {
-
       ret = LlamaHelper.shared.talk(lines[0]);
       return null;
     }
-    protected void onPostExecute(Long result) {
+
+    @Override
+    protected void onPostExecute(Void unused) {
+      super.onPostExecute(unused);
+      Log.e(TAG, "Task End");
       toggleState(State.END);
       if ( ret == true){
         etInput.getText().clear();

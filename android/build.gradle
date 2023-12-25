@@ -37,7 +37,7 @@ def reactNativeArchitectures() {
 }
 
 android {
-    ndkVersion '25.1.8937393'
+    ndkVersion '26.1.10909125'
     def ndkVersionMajor = ndkVersion.split("\\.")[0].toInteger()
   if (ndkVersionMajor < 24) {
     ndkVersion = project.properties["RNLlama_ndkversion"]
