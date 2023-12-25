@@ -7,7 +7,18 @@
   android:theme="@style/ThemeOverlay.RNLlamaExample.FullscreenContainer"
   tools:context=".FullscreenActivity">
 
+  <FrameLayout
+    android:layout_weight="0.7"
+    android:id="@+id/AvatarLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_above="@id/llResponse"
+    >
+
+  </FrameLayout>
+
   <LinearLayout
+    android:id="@+id/llResponse"
     android:layout_alignParentBottom="true"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -18,7 +29,7 @@
       android:id="@+id/tvResponse"
 
       android:layout_width="match_parent"
-      android:layout_height="wrap_content">
+      android:layout_height="80dp">
     </TextView>
     <LinearLayout
       android:orientation="horizontal"
