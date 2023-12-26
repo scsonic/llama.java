@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,6 +38,7 @@ import com.hdb.avatar.EmotionType;
 import com.hdb.avatar.IAvatarPlayerEvents;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -52,8 +54,14 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     EditText etInput ;
 
     BroadcastReceiver receiver ;
+    TtsHelper ttsHelper;
+
+
+    int wavCnt = 0;
 
     private AvatarPlayer mAvatarPlayer;
+    boolean isAutoScroll = true ;
+    String bufferMessage = "" ;
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -79,6 +87,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   private View.OnClickListener onSubmit = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
+      isAutoScroll = true ;
+      bufferMessage = "" ;
+
       String text = etInput.getText().toString();
       //boolean ret = LlamaHelper.shared.talk(text);
 
@@ -105,8 +116,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Common.act = this;
         setContentView(R.layout.activity_fullscreen);
+        ttsHelper = new TtsHelper(this);
 
         FrameLayout avatarLayout = findViewById(R.id.AvatarLayout);
       mAvatarPlayer = new AvatarPlayer(this, avatarLayout, this);
@@ -117,6 +130,15 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
        btnStop = findViewById(R.id.btnStop);
        ivBackground = findViewById(R.id.ivBackground);
        tvResponse = findViewById(R.id.tvResponse);
+      tvResponse.setMovementMethod(new ScrollingMovementMethod());
+      tvResponse.setOnTouchListener(new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+          isAutoScroll = false;
+          return false;
+        }
+      });
+
        etInput = findViewById(R.id.etInput);
        btnSubmit.setOnClickListener(onSubmit);
         btnStop.setOnClickListener(onStop);
@@ -134,17 +156,24 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
            }
          }.start();
 
-//         receiver = new LlamaReceiver();
-//          IntentFilter reg = new IntentFilter("com.rnllama.send");
-//         registerReceiver(receiver, reg);
 
     receiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
         if (intent.hasExtra("token")) {
-          Log.e(TAG, "On Receive v2:" + intent.getStringExtra("token"));
           String text = intent.getStringExtra("token");
-          tvResponse.setText(tvResponse.getText() + text);
+          bufferMessage += text ;
+          mHandler.post(()->{
+            processSplit();
+          });
+          tvResponse.append(text);
+          if ( isAutoScroll) {
+            final int scrollAmount = tvResponse.getLayout().getLineTop(tvResponse.getLineCount()) - tvResponse.getHeight();
+            if (scrollAmount > 0)
+              tvResponse.scrollTo(0, scrollAmount + 50);
+            else
+              tvResponse.scrollTo(0, 0);
+          }
         }
       }
     };
@@ -153,6 +182,29 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
       }
 
+      public void processSplit(){
+        boolean hasDot = bufferMessage.contains(".") || bufferMessage.contains(",") || bufferMessage.contains("\n");
+        if (hasDot){
+          processTTSAsync(bufferMessage);
+          bufferMessage = "" ;
+        }
+      }
+      public void processTTSAsync(String msg){
+        new Thread(){
+          @Override
+          public void run() {
+            processTTS(msg);
+          }
+        }.start();
+      }
+      public void processTTS(String msg){
+        if (msg.trim().length() == 0) {
+          return ;
+        }
+        Log.e(TAG, "processTTS: " + msg);
+        wavCnt = (wavCnt+1)%10;
+        ttsHelper.convertTextToSpeechAndSaveToFile(msg);
+      }
   @Override
   protected void onDestroy() {
     mAvatarPlayer.destroy();
@@ -187,12 +239,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   @Override
   public void onLoadAvatarComplete(boolean success) {
     Log.e(TAG, "Load = " + success) ;
-    if (success) {
-          mAvatarPlayer.speak("https://unity-chan.com/sounds/voice/kohaku01.mp3", EmotionType.sad, true);
-          mAvatarPlayer.speak("https://unity-chan.com/sounds/voice/kohaku02.mp3", EmotionType.angry, true);
-          mAvatarPlayer.speak("https://audio-samples.github.io/samples/mp3/blizzard_tts_unbiased/sample-0/real.mp3", EmotionType.happy, true);
-          mAvatarPlayer.speak("https://audio-samples.github.io/samples/mp3/blizzard_tts_unbiased/sample-3/real.mp3", EmotionType.surprised, true);
-    }
+//    if (success) {
+//          mAvatarPlayer.speak("https://unity-chan.com/sounds/voice/kohaku01.mp3", EmotionType.sad, true);
+//          mAvatarPlayer.speak("https://unity-chan.com/sounds/voice/kohaku02.mp3", EmotionType.angry, true);
+//          mAvatarPlayer.speak("https://audio-samples.github.io/samples/mp3/blizzard_tts_unbiased/sample-0/real.mp3", EmotionType.happy, true);
+//          mAvatarPlayer.speak("https://audio-samples.github.io/samples/mp3/blizzard_tts_unbiased/sample-3/real.mp3", EmotionType.surprised, true);
+//    }
   }
 
   enum State {
@@ -216,7 +268,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     protected void onPreExecute() {
       super.onPreExecute();
       Log.e(TAG, "Task Start");
-      tvResponse.setText("(Processing)");
+      tvResponse.setText("");
       toggleState(State.TALKING);
     }
 
@@ -233,6 +285,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       if ( ret == true){
         etInput.getText().clear();
       }
+
+      // talk the last
+      processTTSAsync(bufferMessage);
+      bufferMessage = "" ;
     }
   }
 }
