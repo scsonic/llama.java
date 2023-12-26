@@ -22,6 +22,8 @@ import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +45,9 @@ import java.nio.charset.StandardCharsets;
 public class FullscreenActivity extends AppCompatActivity implements IAvatarPlayerEvents {
   static public String TAG = "FSA" ;
     private final Handler mHandler = new Handler(Looper.myLooper());
-    Button btnSubmit ;
+    ImageButton btnSubmit ;
+    ImageButton btnStop ;
+    ImageView ivBackground;
     TextView tvResponse ;
     EditText etInput ;
 
@@ -90,6 +94,13 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       task.execute(text);
     }
   };
+  private View.OnClickListener onStop = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      LlamaHelper.shared.lctx.stopCompletion();
+      toggleState(State.FREE);
+    }
+  };
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,11 +114,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
 
        btnSubmit  = findViewById(R.id.btnSubmit);
+       btnStop = findViewById(R.id.btnStop);
+       ivBackground = findViewById(R.id.ivBackground);
        tvResponse = findViewById(R.id.tvResponse);
        etInput = findViewById(R.id.etInput);
-
        btnSubmit.setOnClickListener(onSubmit);
-
+        btnStop.setOnClickListener(onStop);
 
       btnSubmit.setEnabled(false);
          new Thread(){
@@ -184,14 +196,16 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   }
 
   enum State {
-    TALKING, INIT, END
+    TALKING, INIT, FREE
   }
   public void toggleState(State state){
     if (state == State.TALKING){
-      btnSubmit.setEnabled(false);
+      btnSubmit.setVisibility(View.GONE);
+      btnStop.setVisibility(View.VISIBLE);
     }
-    else if (state == State.END){
-      btnSubmit.setEnabled(true);
+    else if (state == State.FREE){
+      btnSubmit.setVisibility(View.VISIBLE);
+      btnStop.setVisibility(View.GONE);
     }
   }
 
@@ -214,8 +228,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     @Override
     protected void onPostExecute(Void unused) {
       super.onPostExecute(unused);
-      Log.e(TAG, "Task End");
-      toggleState(State.END);
+      Log.e(TAG, "Task End, FREE");
+      toggleState(State.FREE);
       if ( ret == true){
         etInput.getText().clear();
       }
