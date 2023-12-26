@@ -3,9 +3,20 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:background="?attr/fullscreenBackgroundColor"
-  android:theme="@style/ThemeOverlay.RNLlamaExample.FullscreenContainer"
-  tools:context=".FullscreenActivity">
+  android:background="@drawable/back1"
+  tools:context=".FullscreenActivity"
+  >
+
+  <ImageView
+    android:visibility="gone"
+    android:id="@+id/ivBackground"
+    android:src="@drawable/back1"
+    android:scaleType="fitXY"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  </ImageView>
+
 
   <FrameLayout
     android:layout_weight="0.7"
@@ -24,7 +35,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ccc"
-    android:alpha="05">
+    android:alpha="0.5">
     <TextView
       android:id="@+id/tvResponse"
 
@@ -51,4 +62,11 @@
     </LinearLayout>
   </LinearLayout>
 
+  <ImageButton
+    android:src="@drawable/baseline_send_24"
+    android:layout_alignParentRight="true"
+    android:layout_width="50dp"
+    android:layout_height="50dp">
+
+  </ImageButton>
 </RelativeLayout>
