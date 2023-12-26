@@ -56,9 +56,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     BroadcastReceiver receiver ;
     TtsHelper ttsHelper;
 
-
-    int wavCnt = 0;
-
     private AvatarPlayer mAvatarPlayer;
     boolean isAutoScroll = true ;
     String bufferMessage = "" ;
@@ -96,7 +93,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       if (BuildConfig.DEBUG){
         if (text.length() == 0){
           int a = (int)(System.currentTimeMillis() % 10);
-          int b = (int)(System.currentTimeMillis() % 10);
+          int b = (int)((System.currentTimeMillis()*12345) % 10);
           text = String.format("%d + %d = ", a, b);
           etInput.setText(text, null);
         }
@@ -202,7 +199,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           return ;
         }
         Log.e(TAG, "processTTS: " + msg);
-        wavCnt = (wavCnt+1)%10;
         ttsHelper.convertTextToSpeechAndSaveToFile(msg);
       }
   @Override

@@ -30,7 +30,7 @@ public class LlamaHelper {
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
 
-      String [] gguf_list = new String[] {"rocket-3b.Q2_K.gguf", "zephyr-7b-alpha.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf"};
+      String [] gguf_list = new String[] {"rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
       for (String file : gguf_list){
@@ -45,6 +45,13 @@ public class LlamaHelper {
       }
 
       lctx = new LlamaContext(54321, null, params);
+      String prompt = "Transcript of a dialog, where the User interacts with an Assistant named Bob. Bob is helpful, kind, honest, good at writing, and never fails to answer the User's requests immediately and with precision.\n" +
+        "\n" +
+        "User: Hello, Bob.\n" +
+        "Bob: Hello. How may I help you today?";
+
+      String prompt2 = "You are a helpful assistant.";
+      //talk(prompt2);
     }
 
     if ( lctx != null){
@@ -70,9 +77,14 @@ public class LlamaHelper {
       return false;
     }
     WritableMap data = Arguments.createMap();
-    line += ", answer shortly. ";
+    line += "";
     Log.e(TAG, "talk:" + line);
-    data.putString(toUtf8("prompt"), toUtf8(line));
+    //String prompt = "This is a conversation between user and llama, a friendly chatbot. respond in simple and short. ";
+
+    //String prompt = "This is a conversation between user and llama, a friendly chatbot.\\n\\nUser: " + line + "\\nLlama:";
+
+    String prompt2 = "You are a helpful assistant. ";
+    data.putString(toUtf8("prompt"), toUtf8(prompt2 + line));
     lctx.completion(data);
 
     return true ;
