@@ -30,13 +30,17 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.rnllama.LlamaContext;
+import com.hdb.avatar.AvatarPlayer;
+import com.hdb.avatar.EmotionType;
+import com.hdb.avatar.IAvatarPlayerEvents;
+
 import java.nio.charset.StandardCharsets;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity {
+public class FullscreenActivity extends AppCompatActivity implements IAvatarPlayerEvents {
   static public String TAG = "FSA" ;
     private final Handler mHandler = new Handler(Looper.myLooper());
     Button btnSubmit ;
@@ -94,7 +98,8 @@ public class FullscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fullscreen);
 
         FrameLayout avatarLayout = findViewById(R.id.AvatarLayout);
-        mAvatarPlayer = new AvatarPlayer(this, avatarLayout);
+      mAvatarPlayer = new AvatarPlayer(this, avatarLayout, this);
+        mAvatarPlayer.loadAvatar("https://models.readyplayer.me/656ee050869b42cd909818a8.glb");
 
 
        btnSubmit  = findViewById(R.id.btnSubmit);
@@ -165,6 +170,17 @@ public class FullscreenActivity extends AppCompatActivity {
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     mAvatarPlayer.configurationChanged(newConfig);
+  }
+
+  @Override
+  public void onLoadAvatarComplete(boolean success) {
+    Log.e(TAG, "Load = " + success) ;
+    if (success) {
+          mAvatarPlayer.speak("https://unity-chan.com/sounds/voice/kohaku01.mp3", EmotionType.sad, true);
+          mAvatarPlayer.speak("https://unity-chan.com/sounds/voice/kohaku02.mp3", EmotionType.angry, true);
+          mAvatarPlayer.speak("https://audio-samples.github.io/samples/mp3/blizzard_tts_unbiased/sample-0/real.mp3", EmotionType.happy, true);
+          mAvatarPlayer.speak("https://audio-samples.github.io/samples/mp3/blizzard_tts_unbiased/sample-3/real.mp3", EmotionType.surprised, true);
+    }
   }
 
   enum State {
