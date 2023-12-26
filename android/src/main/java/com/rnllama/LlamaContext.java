@@ -42,7 +42,7 @@ public class LlamaContext {
     if (!params.hasKey("model")) {
       throw new IllegalArgumentException("Missing required parameter: model");
     }
-    Log.e(NAME, "SomeOneHas Init COntext");
+
     this.id = id;
     this.context = initContext(
       // String model,
@@ -50,9 +50,9 @@ public class LlamaContext {
       // boolean embedding,
       params.hasKey("embedding") ? params.getBoolean("embedding") : false,
       // int n_ctx,
-      params.hasKey("n_ctx") ? params.getInt("n_ctx") : 512,
+      params.hasKey("n_ctx") ? params.getInt("n_ctx") : 1024,
       // int n_batch,
-      params.hasKey("n_batch") ? params.getInt("n_batch") : 512,
+      params.hasKey("n_batch") ? params.getInt("n_batch") : 256,
       // int n_threads,
       params.hasKey("n_threads") ? params.getInt("n_threads") : 4,
       // int n_gpu_layers, // TODO: Support this
@@ -167,9 +167,9 @@ public class LlamaContext {
       // float temperature,
       params.hasKey("temperature") ? (float) params.getDouble("temperature") : 0.7f,
       // int n_threads,
-      params.hasKey("n_threads") ? params.getInt("n_threads") : 0,
+      params.hasKey("n_threads") ? params.getInt("n_threads") : 4,
       // int n_predict,
-      params.hasKey("n_predict") ? params.getInt("n_predict") : -1,
+      params.hasKey("n_predict") ? params.getInt("n_predict") : 128,
       // int n_probs,
       params.hasKey("n_probs") ? params.getInt("n_probs") : 0,
       // int penalty_last_n,
@@ -189,7 +189,7 @@ public class LlamaContext {
       // int top_k,
       params.hasKey("top_k") ? params.getInt("top_k") : 40,
       // float top_p,
-      params.hasKey("top_p") ? (float) params.getDouble("top_p") : 0.95f,
+      params.hasKey("top_p") ? (float) params.getDouble("top_p") : 0.80f,
       // float min_p,
       params.hasKey("min_p") ? (float) params.getDouble("min_p") : 0.05f,
       // float tfs_z,
