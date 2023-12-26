@@ -109,7 +109,7 @@ public class LlamaContext {
     }
 
     void onPartialCompletion(WritableMap tokenResult) {
-      Log.e("@@", "@@ TokenResult:" + tokenResult.toString());
+      Log.d("@@", "@@ TokenResult:" + tokenResult.toString());
 
       notifyPartString(tokenResult.getString("token"));
 
@@ -219,7 +219,7 @@ public class LlamaContext {
     intent.putExtra("token", part);
 
     if (ctx != null){
-      Log.e("@@", "action has send:" + part);
+      //Log.d("@@", "action has send:" + part);
       ctx.sendBroadcast(intent);
     }
   }
