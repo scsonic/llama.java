@@ -1,9 +1,12 @@
 package com.rnllamaexample;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,13 +16,16 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -139,6 +145,20 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
        etInput = findViewById(R.id.etInput);
        btnSubmit.setOnClickListener(onSubmit);
         btnStop.setOnClickListener(onStop);
+
+    etInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+      @Override
+      public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+          // 在這裡執行您的操作
+          if ( btnSubmit.isEnabled()) {
+            btnSubmit.callOnClick();
+          }
+          return true;
+        }
+        return false;
+      }
+    });
 
       btnSubmit.setEnabled(false);
          new Thread(){
@@ -287,4 +307,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       bufferMessage = "" ;
     }
   }
+
+
 }

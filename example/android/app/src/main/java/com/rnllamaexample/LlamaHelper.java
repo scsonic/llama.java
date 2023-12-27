@@ -78,13 +78,17 @@ public class LlamaHelper {
     }
     WritableMap data = Arguments.createMap();
     line += "";
-    Log.e(TAG, "talk:" + line);
-    //String prompt = "This is a conversation between user and llama, a friendly chatbot. respond in simple and short. ";
 
-    //String prompt = "This is a conversation between user and llama, a friendly chatbot.\\n\\nUser: " + line + "\\nLlama:";
 
-    String prompt2 = "You are a helpful assistant. ";
-    data.putString(toUtf8("prompt"), toUtf8(prompt2 + line));
+    String template = "system\n" +
+      "You are Ratail AI, a helpful AI assistant. answer shortly and clearly.\n" +
+      "user\n" +
+      line + "\n" +
+      "assistant";
+
+    Log.e(TAG, "talk:" + template);
+
+    data.putString(toUtf8("prompt"), toUtf8(template));
     lctx.completion(data);
 
     return true ;
