@@ -51,7 +51,7 @@ import java.util.Arrays;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity implements IAvatarPlayerEvents {
+public class FullscreenActivity extends AppCompatActivity implements IAvatarPlayerEvents, TtsHelper.onDoneCallback {
   static public String TAG = "FSA" ;
     private final Handler mHandler = new Handler(Looper.myLooper());
     ImageButton btnSubmit ;
@@ -125,6 +125,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         Common.act = this;
         setContentView(R.layout.activity_fullscreen);
         ttsHelper = new TtsHelper(this);
+        ttsHelper.cb = this;
 
         FrameLayout avatarLayout = findViewById(R.id.AvatarLayout);
       mAvatarPlayer = new AvatarPlayer(this, avatarLayout, this);
@@ -312,5 +313,11 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     }
   }
 
+  @Override
+  public void onDone(String path) {
+    int val = (int) (Math.random()*6);
 
+    Log.e(TAG, "On Wav callback! wav=" + path) ;
+    mAvatarPlayer.speak("file://" + path, EmotionType.happy, true);
+  }
 }

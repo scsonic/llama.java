@@ -25,6 +25,13 @@ public class TtsHelper {
   private Context context;
 
   int fileCnt = 0;
+  onDoneCallback cb ;
+
+  interface onDoneCallback {
+    default void onDone(String path){
+
+    }
+  }
 
   public TtsHelper(Context context) {
     this.context = context;
@@ -73,7 +80,11 @@ public class TtsHelper {
         try {
           // Set up file path for WAV
           File wavFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), utteranceId);
-          playStoredWavFile(wavFile.getAbsolutePath());
+          //playStoredWavFile(wavFile.getAbsolutePath());
+          if ( cb != null ) {
+            cb.onDone(wavFile.getAbsolutePath());
+          }
+
         } catch (Exception e) {
           Log.e(TAG, "Write file fail", e) ;
         }
