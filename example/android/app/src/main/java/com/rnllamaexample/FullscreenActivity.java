@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     ImageView ivBackground;
     TextView tvResponse ;
     EditText etInput ;
+    ProgressBar pbLoading;
 
     BroadcastReceiver receiver ;
     TtsHelper ttsHelper;
@@ -128,7 +130,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       mAvatarPlayer = new AvatarPlayer(this, avatarLayout, this);
         mAvatarPlayer.loadAvatar("https://models.readyplayer.me/656ee050869b42cd909818a8.glb");
 
-
+      pbLoading = findViewById(R.id.pbLoading);
        btnSubmit  = findViewById(R.id.btnSubmit);
        btnStop = findViewById(R.id.btnStop);
        ivBackground = findViewById(R.id.ivBackground);
@@ -270,10 +272,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     if (state == State.TALKING){
       btnSubmit.setVisibility(View.GONE);
       btnStop.setVisibility(View.VISIBLE);
+      pbLoading.setVisibility(View.VISIBLE);
     }
     else if (state == State.FREE){
       btnSubmit.setVisibility(View.VISIBLE);
       btnStop.setVisibility(View.GONE);
+      pbLoading.setVisibility(View.GONE);
     }
   }
 
