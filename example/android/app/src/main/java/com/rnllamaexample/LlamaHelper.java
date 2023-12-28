@@ -79,12 +79,11 @@ public class LlamaHelper {
     WritableMap data = Arguments.createMap();
     line += "";
 
-
-    String template = "system\n" +
-      "You are Ratail AI, a helpful AI assistant. answer shortly and clearly.\n" +
-      "user\n" +
-      line + "\n" +
-      "assistant";
+    String template = "<|im_start|>system\n" +
+      "You are RetailAI, a helpful AI assistant.<|im_end|>\n" +
+      "<|im_start|>user\n" +
+      line + "<|im_end|>\n" +
+      "<|im_start|>assistant";
 
     Log.e(TAG, "talk:" + template);
 
