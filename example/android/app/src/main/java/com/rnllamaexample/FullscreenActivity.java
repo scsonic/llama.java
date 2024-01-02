@@ -39,11 +39,13 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.hdb.avatar.ModelHelper;
 import com.rnllama.LlamaContext;
 import com.hdb.avatar.AvatarPlayer;
 import com.hdb.avatar.EmotionType;
 import com.hdb.avatar.IAvatarPlayerEvents;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -129,7 +131,11 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
         FrameLayout avatarLayout = findViewById(R.id.AvatarLayout);
       mAvatarPlayer = new AvatarPlayer(this, avatarLayout, this);
-        mAvatarPlayer.loadAvatar("https://models.readyplayer.me/656ee050869b42cd909818a8.glb");
+
+        //mAvatarPlayer.loadAvatar("https://models.readyplayer.me/656ee050869b42cd909818a8.glb");
+
+    ModelHelper.getGlb(this);
+    mAvatarPlayer.loadAvatar("file:///sdcard/Download/james2.glb");
 
       pbLoading = findViewById(R.id.pbLoading);
        btnSubmit  = findViewById(R.id.btnSubmit);
@@ -202,7 +208,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
       }
 
-      public void processSplit(){
+  private void test() {
+    File f = new File("/sdcard/Download/james.glb");
+    Log.e(TAG, "@@ " + f.getAbsolutePath() + " f exist:" + f.exists());
+  }
+
+  public void processSplit(){
         boolean hasDot = bufferMessage.contains(".") || bufferMessage.contains(",") || bufferMessage.contains("\n");
         if (hasDot){
           processTTSAsync(bufferMessage);
