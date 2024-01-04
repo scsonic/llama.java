@@ -12,8 +12,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -32,6 +34,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -53,6 +56,7 @@ import com.hdb.avatar.IAvatarPlayerEvents;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -68,6 +72,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     TextView tvResponse ;
     EditText etInput ;
     ProgressBar pbLoading;
+  ImageButton btnMore;
 
     BroadcastReceiver receiver ;
     TtsHelper ttsHelper;
@@ -146,6 +151,126 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       }
     });
 
+
+
+  private View.OnClickListener onMorePress = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      ArrayList<String> itemList = new ArrayList<>();
+      itemList.add("Select Avatar");
+      itemList.add("Select Background");
+
+      // 创建AlertDialog.Builder
+      AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+      builder.setTitle("Select Function");
+
+      // 设置列表适配器
+      ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(FullscreenActivity.this, android.R.layout.simple_list_item_1, itemList);
+      builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          // 处理选项点击事件
+          String selectedItem = itemList.get(which);
+          int raw_id = 0;
+          if (which == 0 ){
+            UIShowModelSelection();
+          }
+          else if (which == 1 ){
+            UIShowBackgroundSelection();
+          }
+        }
+      });
+
+      builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+        }
+      });
+
+      AlertDialog alertDialog = builder.create();
+      alertDialog.show();
+    }
+  };
+
+  public void UIShowModelSelection(){
+    ArrayList<String> itemList = new ArrayList<>();
+    itemList.add("james.glb");
+    itemList.add("james2.glb");
+    itemList.add("engineer.glb");
+
+    // 创建AlertDialog.Builder
+    AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+    builder.setTitle("Select Model");
+
+    // 设置列表适配器
+    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(FullscreenActivity.this, android.R.layout.simple_list_item_1, itemList);
+    builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        // 处理选项点击事件
+        String selectedItem = itemList.get(which);
+        int raw_id = 0;
+        if (which == 0 ){
+          raw_id = R.raw.james;
+        }
+        else if (which == 1 ){
+          raw_id = R.raw.james2;
+        }
+        else if (which == 2 ){
+          raw_id = R.raw.engineer;
+        }
+        String path = ModelHelper.copyRawFileToCache(FullscreenActivity.this, raw_id, selectedItem);
+        mAvatarPlayer.loadAvatar("file://" + path);
+      }
+    });
+
+    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
+  }
+
+  public void UIShowBackgroundSelection() {
+
+    ArrayList<Integer> itemDrawableList = new ArrayList<>();
+    itemDrawableList.add(R.drawable.back1);
+    itemDrawableList.add(R.drawable.back2);
+    itemDrawableList.add(R.drawable.back3);
+
+    ArrayList<String> itemList = new ArrayList<>();
+    itemList.add(getResources().getResourceName(R.drawable.back1));
+    itemList.add(getResources().getResourceName(R.drawable.back2));
+    itemList.add(getResources().getResourceName(R.drawable.back3));
+
+    // 创建AlertDialog.Builder
+    AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+    builder.setTitle("Select Background");
+
+    // 设置列表适配器
+    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(FullscreenActivity.this, android.R.layout.simple_list_item_1, itemList);
+    builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        // 处理选项点击事件
+        int raw_id = itemDrawableList.get(which);
+        ivBackground.setImageResource(raw_id);
+      }
+    });
+
+    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
+  }
+
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,6 +299,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
        btnSubmit  = findViewById(R.id.btnSubmit);
        btnStop = findViewById(R.id.btnStop);
        ivBackground = findViewById(R.id.ivBackground);
+    btnMore = findViewById(R.id.btnMore) ;
        tvResponse = findViewById(R.id.tvResponse);
       tvResponse.setMovementMethod(new ScrollingMovementMethod());
       tvResponse.setOnTouchListener(new View.OnTouchListener() {
@@ -203,6 +329,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     });
 
       btnSubmit.setEnabled(false);
+
+      btnMore.setOnClickListener( onMorePress );
 
          new Thread(){
            @Override
