@@ -4,6 +4,10 @@ import static android.os.Build.VERSION.SDK_INT;
 
 import android.annotation.SuppressLint;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,12 +17,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -69,6 +75,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     private AvatarPlayer mAvatarPlayer;
     boolean isAutoScroll = true ;
     String bufferMessage = "" ;
+    boolean isProcessing = false ;
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -97,13 +104,19 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       isAutoScroll = true ;
       bufferMessage = "" ;
 
+      if (isProcessing){
+        Log.i(TAG, "Running a chat before");
+        return ;
+      }
+      isProcessing = true;
+
       String text = etInput.getText().toString();
       //boolean ret = LlamaHelper.shared.talk(text);
 
       if (BuildConfig.DEBUG){
         if (text.length() == 0){
           int a = (int)(System.currentTimeMillis() % 10);
-          int b = (int)((System.currentTimeMillis()*12345) % 10);
+          int b = (int)((System.currentTimeMillis()*12345+321) % 10);
           text = String.format("%d + %d = ", a, b);
           etInput.setText(text, null);
         }
@@ -117,13 +130,33 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     public void onClick(View view) {
       LlamaHelper.shared.lctx.stopCompletion();
       toggleState(State.FREE);
+      isProcessing = false ;
     }
   };
+
+  private Intent mManageExternalStorageIntent;
+  ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+    new ActivityResultCallback<ActivityResult>() {
+      @Override
+      public void onActivityResult(ActivityResult result) {
+        if (!Environment.isExternalStorageManager()) {
+          Log.d(TAG, "無存取外部檔案權限, 強制停留在要權限畫面");
+          mStartForResult.launch(mManageExternalStorageIntent);
+        }
+      }
+    });
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (!Environment.isExternalStorageManager()) {
+          mManageExternalStorageIntent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName()));
+          mStartForResult.launch(mManageExternalStorageIntent);
+        }
+
+        String path = ModelHelper.copyRawFileToCache(this, R.raw.james2, "james2.glb");
+        Log.e(TAG, "get cache path:" + path) ;
         Common.act = this;
         setContentView(R.layout.activity_fullscreen);
         ttsHelper = new TtsHelper(this);
@@ -135,7 +168,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         //mAvatarPlayer.loadAvatar("https://models.readyplayer.me/656ee050869b42cd909818a8.glb");
 
     ModelHelper.getGlb(this);
-    mAvatarPlayer.loadAvatar("file:///sdcard/Download/james2.glb");
+    mAvatarPlayer.loadAvatar("file://" + path);
 
       pbLoading = findViewById(R.id.pbLoading);
        btnSubmit  = findViewById(R.id.btnSubmit);
@@ -170,6 +203,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     });
 
       btnSubmit.setEnabled(false);
+
          new Thread(){
            @Override
            public void run() {
@@ -314,6 +348,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       super.onPostExecute(unused);
       Log.e(TAG, "Task End, FREE");
       toggleState(State.FREE);
+      isProcessing = false ;
       if ( ret == true){
         etInput.getText().clear();
       }
