@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +32,7 @@ public class TtsHelper {
     default void onDone(String path){
 
     }
+    void onFail(String message);
   }
 
   public TtsHelper(Context context) {
@@ -48,9 +50,11 @@ public class TtsHelper {
           if (result == TextToSpeech.LANG_MISSING_DATA ||
             result == TextToSpeech.LANG_NOT_SUPPORTED) {
             Log.e("TtsHelper", "Language is not supported or missing data");
+            cb.onFail("TTS Fail: Not Support Lang");
           }
         } else {
           Log.e("TtsHelper", "Initialization failed");
+          cb.onFail("TTS INIT Fail");
         }
       }
     });
@@ -61,7 +65,8 @@ public class TtsHelper {
     final String fileName = "output" + fileCnt + ".wav";
 
     // Set up file path
-    final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
+    //final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
+    final File file = new File(context.getCacheDir(), fileName);
     Log.e(TAG, "wav path=" + file.toString());
     // Set up TTS parameters
     HashMap<String, String> params = new HashMap<>();
@@ -79,20 +84,23 @@ public class TtsHelper {
 
         try {
           // Set up file path for WAV
-          File wavFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), utteranceId);
+          File wavFile = new File(context.getCacheDir(), utteranceId);
           //playStoredWavFile(wavFile.getAbsolutePath());
           if ( cb != null ) {
             cb.onDone(wavFile.getAbsolutePath());
+            cb.onFail("Finish:" + utteranceId);
           }
 
         } catch (Exception e) {
           Log.e(TAG, "Write file fail", e) ;
+          cb.onFail("Write File Error:" + e.getMessage());
         }
       }
 
       @Override
       public void onError(String utteranceId) {
         Log.e("TtsHelper", "Text-to-Speech conversion failed");
+        cb.onFail("TTS onError:" + utteranceId);
       }
     });
 

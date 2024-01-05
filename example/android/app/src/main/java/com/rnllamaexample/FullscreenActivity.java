@@ -376,12 +376,20 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   }
 
   public void processSplit(){
-        boolean hasDot = bufferMessage.contains(".") || bufferMessage.contains(",") || bufferMessage.contains("\n");
-        if (hasDot){
-          processTTSAsync(bufferMessage);
-          bufferMessage = "" ;
-        }
+
+    String chars = ".,\n?!():";
+    boolean hasDot = false;
+    for ( char c: chars.toCharArray()){
+      hasDot = bufferMessage.contains(""+c);
+      if (hasDot){
+        break ;
       }
+    }
+      if (hasDot){
+        processTTSAsync(bufferMessage);
+        bufferMessage = "" ;
+      }
+    }
       public void processTTSAsync(String msg){
         new Thread(){
           @Override
@@ -493,5 +501,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
     Log.e(TAG, "On Wav callback! wav=" + path) ;
     mAvatarPlayer.speak("file://" + path, EmotionType.happy, true);
+  }
+
+  @Override
+  public void onFail(String message) {
+    mHandler.post(()->{
+      Toast.makeText(FullscreenActivity.this, message, Toast.LENGTH_SHORT).show();
+    });
   }
 }

@@ -79,14 +79,15 @@ public class LlamaHelper {
     WritableMap data = Arguments.createMap();
     line += "";
 
-    String template = "<|im_start|>system\n" +
-      "You are RetailAI, a helpful AI assistant.<|im_end|>\n" +
-      "<|im_start|>user\n" +
-      line + "<|im_end|>\n" +
-      "<|im_start|>assistant";
+    String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
+
+    String template = "<|system|>" + preprompt + "\n" +
+      "</s>\n" +
+      "<|user|>\n" +
+      line + "</s>\n" +
+      "<|assistant|>";
 
     Log.e(TAG, "talk:" + template);
-
     data.putString(toUtf8("prompt"), toUtf8(template));
     lctx.completion(data);
 
