@@ -1,16 +1,12 @@
 package com.rnllamaexample;
 
-import static android.os.Build.VERSION.SDK_INT;
-
 import android.annotation.SuppressLint;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -21,7 +17,6 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -32,32 +27,22 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowInsets;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 import com.hdb.avatar.ModelHelper;
-import com.rnllama.LlamaContext;
 import com.hdb.avatar.AvatarPlayer;
 import com.hdb.avatar.EmotionType;
 import com.hdb.avatar.IAvatarPlayerEvents;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -159,6 +144,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       ArrayList<String> itemList = new ArrayList<>();
       itemList.add("Select Avatar");
       itemList.add("Select Background");
+      itemList.add("Debug View");
 
       // 创建AlertDialog.Builder
       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -177,6 +163,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           }
           else if (which == 1 ){
             UIShowBackgroundSelection();
+          }
+          else if (which == 2 ){
+            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
+            startActivity(i);
           }
         }
       });
@@ -240,11 +230,13 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     itemDrawableList.add(R.drawable.back1);
     itemDrawableList.add(R.drawable.back2);
     itemDrawableList.add(R.drawable.back3);
+    itemDrawableList.add(R.drawable.back4);
 
     ArrayList<String> itemList = new ArrayList<>();
     itemList.add(getResources().getResourceName(R.drawable.back1));
     itemList.add(getResources().getResourceName(R.drawable.back2));
     itemList.add(getResources().getResourceName(R.drawable.back3));
+    itemList.add(getResources().getResourceName(R.drawable.back4));
 
     // 创建AlertDialog.Builder
     AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -280,7 +272,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           mStartForResult.launch(mManageExternalStorageIntent);
         }
 
-        String path = ModelHelper.copyRawFileToCache(this, R.raw.james2, "james2.glb");
+        String path = ModelHelper.copyRawFileToCache(this, R.raw.james, "james.glb");
         Log.e(TAG, "get cache path:" + path) ;
         Common.act = this;
         setContentView(R.layout.activity_fullscreen);
@@ -403,7 +395,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           return ;
         }
         Log.e(TAG, "processTTS: " + msg);
-        ttsHelper.convertTextToSpeechAndSaveToFile(msg);
+        try {
+          ttsHelper.convertTextToSpeechAndSaveToFile(msg);
+        }
+        catch (Exception ex){
+          Log.e(TAG, "process fail", ex);
+        }
       }
   @Override
   protected void onDestroy() {
@@ -498,15 +495,26 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   @Override
   public void onDone(String path) {
     int val = (int) (Math.random()*6);
-
     Log.e(TAG, "On Wav callback! wav=" + path) ;
     mAvatarPlayer.speak("file://" + path, EmotionType.happy, true);
   }
 
   @Override
   public void onFail(String message) {
+    Log.e(TAG, "cb onFail:" + message) ;
     mHandler.post(()->{
-      Toast.makeText(FullscreenActivity.this, message, Toast.LENGTH_SHORT).show();
+      //Toast.makeText(FullscreenActivity.this, message, Toast.LENGTH_SHORT).show();
     });
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    try {
+      ttsHelper.shutdown();
+    }
+    catch (Exception ex){
+      Log.e(TAG, "Shutdown fail") ;
+    }
   }
 }

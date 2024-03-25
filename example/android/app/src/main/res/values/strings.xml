@@ -1,9 +1,9 @@
 <resources>
-  <string name="app_name">RetailGenAI</string>
-  <string name="title_activity_fullscreen">RetailGenAI</string>
-  <string name="dummy_button">Dummy Button</string>
-  <string name="dummy_content">DUMMY\nCONTENT</string>
-  <!-- START to integrate Unity -->
-  <string name="game_view_content_description">RetailGenAI</string>
-  <!-- END to integrate Unity -->
+    <string name="app_name">RetailGenAI</string>
+    <string name="title_activity_fullscreen">RetailGenAI</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- START to integrate Unity -->
+    <string name="game_view_content_description">RetailGenAI</string>
+    <!-- END to integrate Unity -->
 </resources>
