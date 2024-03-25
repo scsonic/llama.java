@@ -5,6 +5,7 @@ import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -45,16 +46,16 @@ public class TtsHelper {
       @Override
       public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-          int result = textToSpeech.setLanguage(Locale.US);
-
-          if (result == TextToSpeech.LANG_MISSING_DATA ||
-            result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            Log.e("TtsHelper", "Language is not supported or missing data");
-            cb.onFail("TTS Fail: Not Support Lang");
-          }
+//          int result = textToSpeech.setLanguage(Locale.US);
+//
+//          if (result == TextToSpeech.LANG_MISSING_DATA ||
+//            result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//            Log.e("TtsHelper", "Language is not supported or missing data");
+//            cb.onFail("TTS Fail: Not Support Lang");
+//          }
         } else {
           Log.e("TtsHelper", "Initialization failed");
-          cb.onFail("TTS INIT Fail");
+          cb.onFail("TTS INIT Fail:" + status);
         }
       }
     });
@@ -69,8 +70,10 @@ public class TtsHelper {
     final File file = new File(context.getCacheDir(), fileName);
     Log.e(TAG, "wav path=" + file.toString());
     // Set up TTS parameters
-    HashMap<String, String> params = new HashMap<>();
-    params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileName);
+    //HashMap<String, String> params = new HashMap<>();
+    //params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileName);
+    Bundle myparams = new Bundle();
+    myparams.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileName);
 
     textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
       @Override
@@ -80,15 +83,15 @@ public class TtsHelper {
 
       @Override
       public void onDone(String utteranceId) {
-        Log.i(TAG, "TTS Done:" + utteranceId);
 
         try {
           // Set up file path for WAV
           File wavFile = new File(context.getCacheDir(), utteranceId);
+          Log.e(TAG, "TTS Done:" + utteranceId + " FileSIze=" + wavFile.length());
           //playStoredWavFile(wavFile.getAbsolutePath());
           if ( cb != null ) {
             cb.onDone(wavFile.getAbsolutePath());
-            cb.onFail("Finish:" + utteranceId);
+            //cb.onFail("Finish:" + utteranceId);
           }
 
         } catch (Exception e) {
@@ -99,13 +102,19 @@ public class TtsHelper {
 
       @Override
       public void onError(String utteranceId) {
-        Log.e("TtsHelper", "Text-to-Speech conversion failed");
+        Log.e("TtsHelper", "Text-to-Speech conversion failed:" + utteranceId);
         cb.onFail("TTS onError:" + utteranceId);
       }
     });
 
+
+
+
     // Convert text to speech
-    textToSpeech.synthesizeToFile(text, params, file.getAbsolutePath());
+    //textToSpeech.synthesizeToFile(text, params, file.getAbsolutePath());
+
+
+    textToSpeech.synthesizeToFile(text, myparams, file, fileName);
     return file.getAbsolutePath();
   }
 
