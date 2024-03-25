@@ -12,7 +12,7 @@ embedding = HuggingFaceEmbeddings(model_name=model_name,)
 print("end loading embeding");
 
 # Load the document, split it into chunks, embed each chunk and load it into the vector store.
-raw_documents = TextLoader('UNOlite_user_manual_eng.txt').load()
+raw_documents = TextLoader('eos1100.txt').load()
 text_splitter = CharacterTextSplitter(chunk_size=256, chunk_overlap=0)
 print("return type=", type(text_splitter))
 
@@ -24,39 +24,47 @@ print("FAISS END")
 
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain_community.llms import LlamaCpp
-model_path = "/sdcard/Download/rocket-3b.Q4_0.gguf"
-
-print("load llm")
-llm = LlamaCpp(
-    model_path=model_path,
-    n_gpu_layers=0,
-    n_ctx=2048,
-    f16_kv=True,
-    callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
-    verbose=True,
-)
 
 print("llm loaded")
-
-
 from langchain.globals import set_verbose, set_debug
 set_debug(True)
 set_verbose(True)
 from langchain.chains import RetrievalQA
 
 retriever = db.as_retriever(search_kwargs={"k":6})
+docs = db.similarity_search("sdcard")
+print(docs)
 
-qa = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-    verbose=True,
-)
+from flask import Flask, request, jsonify
 
+app = Flask(__name__)
 
-while True:
-    print("user input:")
-    query = input()
-    response = qa.invoke(query)
+# 用于存储上传的 JSON 数据
+uploaded_data = {}
 
+# 上传 JSON 数据
+@app.route('/upload', methods=['POST'])
+def upload_json():
+    data = request.get_json()
+    if data is None:
+        return jsonify({'error': 'No JSON data provided'}), 400
+    uploaded_data.update(data)
+    return jsonify({'message': 'JSON data uploaded successfully'})
+
+# 查询并返回 JSON 数据
+@app.route('/query', methods=['GET'])
+def query_json():
+    query_string = request.args.get('query')
+    if query_string is None:
+        return jsonify({'error': 'No query provided'}), 400
+    obj = db.similarity_search(query_string)
+    print(obj)
+
+    arr = []
+    for doc in obj:
+      arr.append(doc.page_content)
+    result = {"docs": arr}
+    return jsonify(result)
+
+if __name__ == '__main__':
+    app.run(debug=True, port=8080)

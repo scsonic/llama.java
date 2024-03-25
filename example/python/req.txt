@@ -1,0 +1,2 @@
+
+pip install langchain faiss-cpu flask sentence-transformers
