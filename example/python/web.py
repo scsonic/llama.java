@@ -25,7 +25,6 @@ print("FAISS END")
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
-print("llm loaded")
 from langchain.globals import set_verbose, set_debug
 set_debug(True)
 set_verbose(True)
@@ -67,4 +66,4 @@ def query_json():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=10080)
