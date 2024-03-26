@@ -30,7 +30,7 @@ public class LlamaHelper {
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
 
-      String [] gguf_list = new String[] {"rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
+      String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
       for (String file : gguf_list){
@@ -81,6 +81,10 @@ public class LlamaHelper {
 
     String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
 
+    if (RagApi.RagEnable){
+      preprompt = "Use the following pieces of context to answer the question at the end." +
+        "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n" ;
+    }
     String template = "<|system|>" + preprompt + "\n" +
       "</s>\n" +
       "<|user|>\n" +
