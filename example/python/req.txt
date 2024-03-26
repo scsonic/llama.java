@@ -1,2 +1,8 @@
 
 pip install langchain faiss-cpu flask sentence-transformers
+
+
+curl "http://127.0.0.1:10080/query?query=record%20video"
+
+curl -X POST -d "This is the entire request body" "http://127.0.0.1:10080/upload"
+curl -X POST -H "Content-Type: text/plain" -d "This is the entire request body" "http://127.0.0.1:10080/upload"
