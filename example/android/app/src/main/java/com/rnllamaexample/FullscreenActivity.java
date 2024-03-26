@@ -50,6 +50,8 @@ import java.util.ArrayList;
  */
 public class FullscreenActivity extends AppCompatActivity implements IAvatarPlayerEvents, TtsHelper.onDoneCallback {
   static public String TAG = "FSA" ;
+
+
     private final Handler mHandler = new Handler(Looper.myLooper());
     ImageButton btnSubmit ;
     ImageButton btnStop ;
@@ -58,6 +60,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     EditText etInput ;
     ProgressBar pbLoading;
   ImageButton btnMore;
+
+
 
     BroadcastReceiver receiver ;
     TtsHelper ttsHelper;
@@ -101,20 +105,33 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       isProcessing = true;
 
       String text = etInput.getText().toString();
-      //boolean ret = LlamaHelper.shared.talk(text);
-
-      if (BuildConfig.DEBUG){
-
-
-        if (text.length() == 0){
-          int a = (int)(System.currentTimeMillis() % 10);
-          int b = (int)((System.currentTimeMillis()*12345+321) % 10);
+      if (BuildConfig.DEBUG) {
+        if (text.length() == 0) {
+          int a = (int) (System.currentTimeMillis() % 10);
+          int b = (int) ((System.currentTimeMillis() * 12345 + 321) % 10);
           text = String.format("%d + %d = ", a, b);
           etInput.setText(text, null);
         }
       }
-      TalkTask task = new TalkTask();
-      task.execute(text);
+      if ( RagApi.RagEnable ) {
+        RagApi.callApi(text, new RagApi.RagCallback() {
+          @Override
+          public void onSuccess(String response) {
+
+            TalkTask task = new TalkTask();
+            task.execute(response);
+          }
+
+          @Override
+          public void onError(String errorMessage) {
+            tvResponse.setText("Init Rag Query Fail, please start Rag Service Again");
+          }
+        });
+      }
+      else {
+        TalkTask task = new TalkTask();
+        task.execute(text);
+      }
     }
   };
   private View.OnClickListener onStop = new View.OnClickListener() {

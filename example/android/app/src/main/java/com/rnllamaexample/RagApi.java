@@ -3,6 +3,10 @@ package com.rnllamaexample;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class RagApi {
+
+  static boolean RagEnable = true ;
 
   // 定义回调接口
   public interface RagCallback {
@@ -49,8 +55,20 @@ public class RagApi {
         }
         reader.close();
 
-        return response.toString();
-      } catch (IOException e) {
+
+        // convert to full string
+
+        String oneline = "";
+        JSONObject obj = new JSONObject(response.toString());
+        if (obj.has("docs")){
+          JSONArray arr = obj.getJSONArray("docs") ;
+          for (int i = 0 ; i < arr.length() ; i++){
+            oneline += arr.getString(i) + "\n";
+          }
+        }
+
+        return oneline;
+      } catch (IOException | JSONException e) {
         Log.e("ApiCaller", "Error while calling API", e);
         return null;
       }
