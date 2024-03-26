@@ -41,14 +41,21 @@ app = Flask(__name__)
 # 用于存储上传的 JSON 数据
 uploaded_data = {}
 
-# 上传 JSON 数据
 @app.route('/upload', methods=['POST'])
-def upload_json():
-    data = request.get_json()
-    if data is None:
-        return jsonify({'error': 'No JSON data provided'}), 400
-    uploaded_data.update(data)
-    return jsonify({'message': 'JSON data uploaded successfully'})
+def upload_txt():
+    data = request.data.decode('utf-8')  # 获取请求的原始正文，并将字节流解码为字符串
+    print("@@", request.data)
+    if not data:
+        return jsonify({'error': 'No data provided in request body'}), 400
+    # uploaded_data['text'] = data  # 存储整个请求正文
+
+    # Load the document, split it into chunks, embed each chunk and load it into the vector store.
+    ts = CharacterTextSplitter(chunk_size=256, chunk_overlap=0)
+    sdata = str(data)
+    print("@@ need print the type of data", type(data), sdata)
+    arr = [x for x in ts.split_text(sdata)]
+    db.add_texts(arr)
+    return data
 
 # 查询并返回 JSON 数据
 @app.route('/query', methods=['GET'])
@@ -66,4 +73,4 @@ def query_json():
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=10080)
+    app.run(host='0.0.0.0', debug=True, port=10080)

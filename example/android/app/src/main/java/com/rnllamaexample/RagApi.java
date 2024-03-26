@@ -22,6 +22,8 @@ public class RagApi {
 
     private RagCallback callback;
 
+    static public String url = "172.20.10.3:10080";
+
     public RagTask(RagCallback callback) {
       this.callback = callback;
     }
@@ -31,7 +33,7 @@ public class RagApi {
       String query = params[0];
       try {
         // 构建 API 请求 URL
-        String apiUrl = "http://192.168.31.26:8080/query?query=" + query;
+        String apiUrl = "http://" + url + "/query?query=" + query;
         URL url = new URL(apiUrl);
 
         // 打开连接
