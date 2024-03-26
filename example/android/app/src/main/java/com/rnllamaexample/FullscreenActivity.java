@@ -104,17 +104,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       //boolean ret = LlamaHelper.shared.talk(text);
 
       if (BuildConfig.DEBUG){
-        RagApi.callApi(text, new RagApi.RagCallback() {
-          @Override
-          public void onSuccess(String response) {
-            Log.e(TAG, response);
-          }
 
-          @Override
-          public void onError(String errorMessage) {
-            Log.e(TAG, errorMessage);
-          }
-        });
 
         if (text.length() == 0){
           int a = (int)(System.currentTimeMillis() % 10);

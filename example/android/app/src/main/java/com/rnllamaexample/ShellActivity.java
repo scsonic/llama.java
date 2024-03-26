@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 public class ShellActivity extends AppCompatActivity {
 
+  static public String TAG = "ShellActivity" ;
   TextView tvShellOutput ;
   EditText etInput ;
     @Override
@@ -28,10 +29,23 @@ public class ShellActivity extends AppCompatActivity {
             (keyCode == KeyEvent.KEYCODE_ENTER)) {
             // Perform action on key press
             String line = etInput.getText().toString();
-            etInput.setText("",null);
-            String result = ShellHelper.executeCommand(line);
-            Log.e("@@", result) ;
-            tvShellOutput.setText(result);
+            RagApi.callApi(line, new RagApi.RagCallback() {
+              @Override
+              public void onSuccess(String response) {
+                Log.e(TAG, response);
+              }
+
+              @Override
+              public void onError(String errorMessage) {
+                Log.e(TAG, errorMessage);
+              }
+            });
+
+
+//            etInput.setText("",null);
+//            String result = ShellHelper.executeCommand(line);
+//            Log.e("@@", result) ;
+//            tvShellOutput.setText(result);
             return true;
           }
           return false;
