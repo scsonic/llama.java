@@ -28,7 +28,7 @@ public class RagApi {
 
     private RagCallback callback;
 
-    static public String url = "172.20.10.3:10080";
+    static public String url = "127.0.0.1:10080";
 
     public RagTask(RagCallback callback) {
       this.callback = callback;
