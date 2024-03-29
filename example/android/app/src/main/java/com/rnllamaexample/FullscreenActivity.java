@@ -97,6 +97,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     public void onClick(View v) {
       isAutoScroll = true ;
       bufferMessage = "" ;
+      Log.i(TAG, "Press OnSubmit");
 
       if (isProcessing){
         Log.i(TAG, "Running a chat before");
@@ -114,16 +115,17 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         }
       }
       if ( RagApi.RagEnable ) {
+        String finalText = text;
         RagApi.callApi(text, new RagApi.RagCallback() {
           @Override
           public void onSuccess(String response) {
-
             TalkTask task = new TalkTask();
-            task.execute(response);
+            task.execute(finalText, response);
           }
 
           @Override
           public void onError(String errorMessage) {
+            isProcessing = false ;
             tvResponse.setText("Init Rag Query Fail, please start Rag Service Again");
           }
         });
@@ -491,7 +493,13 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     }
 
     protected Void doInBackground(String... lines) {
-      ret = LlamaHelper.shared.talk(lines[0]);
+
+      if (RagApi.RagEnable){
+        ret = LlamaHelper.shared.talk(lines[0], lines[1]);
+      }
+      else {
+        ret = LlamaHelper.shared.talk(lines[0]);
+      }
       return null;
     }
 

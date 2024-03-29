@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class RagApi {
 
-  static boolean RagEnable = true ;
+  static boolean RagEnable = false ;
 
   // 定义回调接口
   public interface RagCallback {
