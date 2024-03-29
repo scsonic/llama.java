@@ -113,6 +113,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           text = String.format("%d + %d = ", a, b);
           etInput.setText(text, null);
         }
+        if (RagApi.RagEnable){
+          etInput.setText("How can i replace battery", null);
+        }
       }
       if ( RagApi.RagEnable ) {
         String finalText = text;
@@ -121,12 +124,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           public void onSuccess(String response) {
             TalkTask task = new TalkTask();
             task.execute(finalText, response);
-        RagApi.callApi(text, new RagApi.RagCallback() {
-          @Override
-          public void onSuccess(String response) {
-
-            TalkTask task = new TalkTask();
-            task.execute(response);
           }
 
           @Override
@@ -506,7 +503,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       else {
         ret = LlamaHelper.shared.talk(lines[0]);
       }
-      ret = LlamaHelper.shared.talk(lines[0]);
       return null;
     }
 
