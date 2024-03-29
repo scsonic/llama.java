@@ -43,6 +43,7 @@ import com.hdb.avatar.IAvatarPlayerEvents;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -111,11 +112,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           int a = (int) (System.currentTimeMillis() % 10);
           int b = (int) ((System.currentTimeMillis() * 12345 + 321) % 10);
           text = String.format("%d + %d = ", a, b);
-          etInput.setText(text, null);
         }
+
         if (RagApi.RagEnable){
-          etInput.setText("How can i replace battery", null);
+          text = "How can i replace battery";
         }
+        etInput.setText(text, null);
       }
       if ( RagApi.RagEnable ) {
         String finalText = text;
@@ -123,6 +125,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           @Override
           public void onSuccess(String response) {
             Log.e(TAG, "Rag Result=" + response);
+            tvResponse.setText("RAG Response:\n" + response);
             TalkTask task = new TalkTask();
             task.execute(finalText, response);
           }
@@ -501,6 +504,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     protected Void doInBackground(String... lines) {
 
       if (RagApi.RagEnable){
+        Log.e(TAG, "Combine result=" + Arrays.toString(lines));
         ret = LlamaHelper.shared.talk(lines[0], lines[1]);
       }
       else {
