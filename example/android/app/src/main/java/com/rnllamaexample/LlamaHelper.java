@@ -31,6 +31,7 @@ public class LlamaHelper {
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
 
       String [] gguf_list = new String[] {"phi-2-super.Q4_K_M.gguf", "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
+      String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
       for (String file : gguf_list){
