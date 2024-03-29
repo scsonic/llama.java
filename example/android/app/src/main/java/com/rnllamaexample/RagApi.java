@@ -45,6 +45,9 @@ public class RagApi {
 
         // 打开连接
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(1000);
+        connection.setReadTimeout(2000);
+
         connection.setRequestMethod("GET");
 
         // 读取 API 响应

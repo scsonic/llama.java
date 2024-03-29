@@ -122,12 +122,14 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         RagApi.callApi(text, new RagApi.RagCallback() {
           @Override
           public void onSuccess(String response) {
+            Log.e(TAG, "Rag Result=" + response);
             TalkTask task = new TalkTask();
             task.execute(finalText, response);
           }
 
           @Override
           public void onError(String errorMessage) {
+            Log.e(TAG, "onError=" + errorMessage);
             isProcessing = false ;
             tvResponse.setText("Init Rag Query Fail, please start Rag Service Again");
           }
@@ -168,7 +170,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       ArrayList<String> itemList = new ArrayList<>();
       itemList.add("Select Avatar");
       itemList.add("Select Background");
-      itemList.add("Debug View");
+      itemList.add("Toggle Rag Mode, current=" + RagApi.RagEnable);
 
       // 创建AlertDialog.Builder
       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -189,8 +191,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
             UIShowBackgroundSelection();
           }
           else if (which == 2 ){
-            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
-            startActivity(i);
+            RagApi.RagEnable = !RagApi.RagEnable;
+//            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
+//            startActivity(i);
           }
         }
       });
