@@ -24,6 +24,15 @@
 
   </FrameLayout>
 
+
+  <Button
+    android:text="RAG"
+    android:id="@+id/btnRag"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:layout_above="@id/llResponse"
+    android:layout_alignParentRight="true">
+  </Button>
   <LinearLayout
     android:id="@+id/llResponse"
     android:layout_alignParentBottom="true"

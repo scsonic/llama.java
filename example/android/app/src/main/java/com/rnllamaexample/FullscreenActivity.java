@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -62,15 +63,26 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     ProgressBar pbLoading;
   ImageButton btnMore;
 
-
-
     BroadcastReceiver receiver ;
     TtsHelper ttsHelper;
+    String lastRagContent = "" ;
 
     private AvatarPlayer mAvatarPlayer;
     boolean isAutoScroll = true ;
     String bufferMessage = "" ;
+    Button btnRag ;
+
     boolean isProcessing = false ;
+
+
+    public void toggleRag(){
+      if (RagApi.RagEnable){
+        btnRag.setVisibility(View.VISIBLE);
+      }
+      else {
+        btnRag.setVisibility(View.GONE);
+      }
+    }
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -125,6 +137,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           @Override
           public void onSuccess(String response) {
             Log.e(TAG, "Rag Result=" + response);
+            lastRagContent = response ;
             tvResponse.setText("RAG Response:\n" + response);
             TalkTask task = new TalkTask();
             task.execute(finalText, response);
@@ -132,9 +145,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
           @Override
           public void onError(String errorMessage) {
+            lastRagContent = "Init Rag Query Fail, please start Rag Service Again" ;
             Log.e(TAG, "onError=" + errorMessage);
             isProcessing = false ;
-            tvResponse.setText("Init Rag Query Fail, please start Rag Service Again");
+            tvResponse.setText(lastRagContent);
           }
         });
       }
@@ -195,6 +209,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           }
           else if (which == 2 ){
             RagApi.RagEnable = !RagApi.RagEnable;
+            toggleRag();
 //            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
 //            startActivity(i);
           }
@@ -352,6 +367,15 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
       btnSubmit.setEnabled(false);
 
+      btnRag = findViewById(R.id.btnRag) ;
+      btnRag.setOnClickListener((v)->{
+        AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+        builder.setTitle("Rag Result");
+        builder.setMessage(lastRagContent) ;
+        builder.show();
+      });
+      toggleRag();
+
       btnMore.setOnClickListener( onMorePress );
 
          new Thread(){
@@ -387,10 +411,11 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         }
       }
     };
-      IntentFilter reg = new IntentFilter("com.rnllama.send");
-         registerReceiver(receiver, reg);
 
-      }
+    IntentFilter reg = new IntentFilter("com.rnllama.send");
+       registerReceiver(receiver, reg);
+
+    }
 
   private void test() {
     File f = new File("/sdcard/Download/james.glb");
