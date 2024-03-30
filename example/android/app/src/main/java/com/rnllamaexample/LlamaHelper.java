@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.rnllama.LlamaContext;
 
@@ -119,6 +120,10 @@ public class LlamaHelper {
 
     Log.e(TAG, "talk:" + template);
     data.putString(toUtf8("prompt"), toUtf8(template));
+
+
+    ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
+    data.putArray("stop", stopString);
     lctx.completion(data);
 
     return true ;

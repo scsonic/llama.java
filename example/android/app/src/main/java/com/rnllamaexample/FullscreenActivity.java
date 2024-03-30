@@ -112,10 +112,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           int a = (int) (System.currentTimeMillis() % 10);
           int b = (int) ((System.currentTimeMillis() * 12345 + 321) % 10);
           text = String.format("%d + %d = ", a, b);
-        }
 
-        if (RagApi.RagEnable){
-          text = "How can i replace battery";
+          if (RagApi.RagEnable){
+            text = "How can i replace battery";
+          }
         }
         etInput.setText(text, null);
       }
@@ -533,7 +533,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   public void onDone(String path) {
     int val = (int) (Math.random()*6);
     Log.e(TAG, "On Wav callback! wav=" + path) ;
-    mAvatarPlayer.speak("file://" + path, EmotionType.happy, true);
+    try {
+      mAvatarPlayer.speak("file://" + path, EmotionType.happy, true);
+    }
+    catch (Exception ex){
+      Log.e(TAG, "Speak got exception") ;
+    }
   }
 
   @Override
