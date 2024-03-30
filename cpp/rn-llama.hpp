@@ -253,7 +253,6 @@ struct llama_rn_context
 
     void loadPrompt()
     {
-        params.prompt.insert(0, 1, ' '); // always add a first space
         std::vector<llama_token> prompt_tokens = ::llama_tokenize(ctx, params.prompt, true);
         num_prompt_tokens = prompt_tokens.size();
 
@@ -320,8 +319,8 @@ struct llama_rn_context
             const int n_left    = n_past - params.n_keep - 1;
             const int n_discard = n_left/2;
 
-            llama_kv_cache_seq_rm   (ctx, 0, params.n_keep + 1            , params.n_keep + n_discard + 1);
-            llama_kv_cache_seq_shift(ctx, 0, params.n_keep + 1 + n_discard, n_past, -n_discard);
+            llama_kv_cache_seq_rm (ctx, 0, params.n_keep + 1            , params.n_keep + n_discard + 1);
+            llama_kv_cache_seq_add(ctx, 0, params.n_keep + 1 + n_discard, n_past, -n_discard);
 
             for (size_t i = params.n_keep + 1 + n_discard; i < embd.size(); i++)
             {

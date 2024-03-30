@@ -30,7 +30,8 @@ public class LlamaHelper {
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
 
-      String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
+      String [] gguf_list = new String[] {"phi-2-super.Q4_K_M.gguf", "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
+      //String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
       for (String file : gguf_list){
@@ -86,6 +87,31 @@ public class LlamaHelper {
         "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n" ;
     }
     String template = "<|system|>" + preprompt + "\n" +
+      "</s>\n" +
+      "<|user|>\n" +
+      line + "</s>\n" +
+      "<|assistant|>";
+
+    Log.e(TAG, "talk:" + template);
+    data.putString(toUtf8("prompt"), toUtf8(template));
+    lctx.completion(data);
+
+    return true ;
+  }
+
+
+  public boolean talk(String line, String rag){
+    if (lctx.isPredicting()){
+      Log.e(TAG, "is isPredicting, cancel");
+      return false;
+    }
+    WritableMap data = Arguments.createMap();
+    line += "";
+
+    String preprompt = "Use the following pieces of context to answer the question at the end." +
+        "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n" ;
+
+    String template = "<|system|>" + preprompt + rag + "\n" +
       "</s>\n" +
       "<|user|>\n" +
       line + "</s>\n" +

@@ -281,11 +281,13 @@ Java_com_rnllama_LlamaContext_doCompletion(
     jfloat mirostat,
     jfloat mirostat_tau,
     jfloat mirostat_eta,
+    jboolean penalize_nl,
     jint top_k,
     jfloat top_p,
     jfloat min_p,
     jfloat tfs_z,
     jfloat typical_p,
+    jint seed,
     jobjectArray stop,
     jboolean ignore_eos,
     jobjectArray logit_bias,
@@ -299,6 +301,7 @@ Java_com_rnllama_LlamaContext_doCompletion(
     llama_reset_timings(llama->ctx);
 
     llama->params.prompt = env->GetStringUTFChars(prompt, nullptr);
+    llama->params.seed = seed;
 
     int max_threads = std::thread::hardware_concurrency();
     // Use 2 threads by default on 4-core devices, 4 threads on more cores
@@ -317,6 +320,7 @@ Java_com_rnllama_LlamaContext_doCompletion(
     sparams.mirostat = mirostat;
     sparams.mirostat_tau = mirostat_tau;
     sparams.mirostat_eta = mirostat_eta;
+    sparams.penalize_nl = penalize_nl;
     sparams.top_k = top_k;
     sparams.top_p = top_p;
     sparams.min_p = min_p;
@@ -366,8 +370,8 @@ Java_com_rnllama_LlamaContext_doCompletion(
         putString(env, result, "error", "Failed to initialize sampling");
         return reinterpret_cast<jobject>(result);
     }
-    llama->loadPrompt();
     llama->beginCompletion();
+    llama->loadPrompt();
 
     size_t sent_count = 0;
     size_t sent_token_probs_index = 0;
@@ -545,8 +549,8 @@ Java_com_rnllama_LlamaContext_embedding(
     llama->params.prompt = text_chars;
 
     llama->params.n_predict = 0;
-    llama->loadPrompt();
     llama->beginCompletion();
+    llama->loadPrompt();
     llama->doCompletion();
 
     std::vector<float> embedding = llama->getEmbedding();

@@ -67,6 +67,8 @@
     if (params[@"rope_freq_base"]) defaultParams.rope_freq_base = [params[@"rope_freq_base"] floatValue];
     if (params[@"rope_freq_scale"]) defaultParams.rope_freq_scale = [params[@"rope_freq_scale"] floatValue];
 
+    if (params[@"seed"]) defaultParams.seed = [params[@"seed"] intValue];
+
     int nThreads = params[@"n_threads"] ? [params[@"n_threads"] intValue] : 0;
     const int maxThreads = (int) [[NSProcessInfo processInfo] processorCount];
     // Use 2 threads by default on 4-core devices, 4 threads on more cores
@@ -131,6 +133,7 @@
     NSString *prompt = [params objectForKey:@"prompt"];
 
     llama->params.prompt = [prompt UTF8String];
+    llama->params.seed = params[@"seed"] ? [params[@"seed"] intValue] : -1;
 
     if (params[@"n_threads"]) {
         int nThreads = params[@"n_threads"] ? [params[@"n_threads"] intValue] : llama->params.n_threads;
@@ -155,6 +158,7 @@
     if (params[@"mirostat"]) sparams.mirostat = [params[@"mirostat"] intValue];
     if (params[@"mirostat_tau"]) sparams.mirostat_tau = [params[@"mirostat_tau"] doubleValue];
     if (params[@"mirostat_eta"]) sparams.mirostat_eta = [params[@"mirostat_eta"] doubleValue];
+    if (params[@"penalize_nl"]) sparams.penalize_nl = [params[@"penalize_nl"] boolValue];
 
     if (params[@"top_k"]) sparams.top_k = [params[@"top_k"] intValue];
     if (params[@"top_p"]) sparams.top_p = [params[@"top_p"] doubleValue];
@@ -200,8 +204,8 @@
     if (!llama->initSampling()) {
         @throw [NSException exceptionWithName:@"LlamaException" reason:@"Failed to initialize sampling" userInfo:nil];
     }
-    llama->loadPrompt();
     llama->beginCompletion();
+    llama->loadPrompt();
 
     size_t sent_count = 0;
     size_t sent_token_probs_index = 0;

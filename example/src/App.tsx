@@ -105,7 +105,7 @@ export default function App() {
     initLlama({
       model: file.uri,
       use_mlock: true,
-      n_gpu_layers: 0, // > 0: enable GPU
+      n_gpu_layers: Platform.OS === 'ios' ? 0 : 0, // > 0: enable GPU
       // embedding: true,
     })
       .then((ctx) => {
@@ -333,6 +333,8 @@ export default function App() {
           mirostat: 0, // 0/1/2
           mirostat_tau: 5, // target entropy
           mirostat_eta: 0.1, // learning rate
+          penalize_nl: true, // penalize newlines
+          seed: 1234, // random seed
           n_probs: 0, // Show probabilities
           stop: ['</s>', 'llama:', 'User:'],
           grammar,

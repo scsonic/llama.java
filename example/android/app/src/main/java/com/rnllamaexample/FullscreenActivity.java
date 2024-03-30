@@ -43,6 +43,7 @@ import com.hdb.avatar.IAvatarPlayerEvents;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -97,6 +98,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     public void onClick(View v) {
       isAutoScroll = true ;
       bufferMessage = "" ;
+      Log.i(TAG, "Press OnSubmit");
 
       if (isProcessing){
         Log.i(TAG, "Running a chat before");
@@ -110,20 +112,28 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           int a = (int) (System.currentTimeMillis() % 10);
           int b = (int) ((System.currentTimeMillis() * 12345 + 321) % 10);
           text = String.format("%d + %d = ", a, b);
-          etInput.setText(text, null);
         }
+
+        if (RagApi.RagEnable){
+          text = "How can i replace battery";
+        }
+        etInput.setText(text, null);
       }
       if ( RagApi.RagEnable ) {
+        String finalText = text;
         RagApi.callApi(text, new RagApi.RagCallback() {
           @Override
           public void onSuccess(String response) {
-
+            Log.e(TAG, "Rag Result=" + response);
+            tvResponse.setText("RAG Response:\n" + response);
             TalkTask task = new TalkTask();
-            task.execute(response);
+            task.execute(finalText, response);
           }
 
           @Override
           public void onError(String errorMessage) {
+            Log.e(TAG, "onError=" + errorMessage);
+            isProcessing = false ;
             tvResponse.setText("Init Rag Query Fail, please start Rag Service Again");
           }
         });
@@ -163,7 +173,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       ArrayList<String> itemList = new ArrayList<>();
       itemList.add("Select Avatar");
       itemList.add("Select Background");
-      itemList.add("Debug View");
+      itemList.add("Toggle Rag Mode, current=" + RagApi.RagEnable);
 
       // 创建AlertDialog.Builder
       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -184,8 +194,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
             UIShowBackgroundSelection();
           }
           else if (which == 2 ){
-            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
-            startActivity(i);
+            RagApi.RagEnable = !RagApi.RagEnable;
+//            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
+//            startActivity(i);
           }
         }
       });
@@ -491,7 +502,14 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     }
 
     protected Void doInBackground(String... lines) {
-      ret = LlamaHelper.shared.talk(lines[0]);
+
+      if (RagApi.RagEnable){
+        Log.e(TAG, "Combine result=" + Arrays.toString(lines));
+        ret = LlamaHelper.shared.talk(lines[0], lines[1]);
+      }
+      else {
+        ret = LlamaHelper.shared.talk(lines[0]);
+      }
       return null;
     }
 

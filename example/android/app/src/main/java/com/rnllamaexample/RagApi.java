@@ -15,7 +15,8 @@ import java.net.URL;
 
 public class RagApi {
 
-  static boolean RagEnable = true ;
+  static boolean RagEnable = false ;
+  //static boolean RagEnable = true ;
 
   // 定义回调接口
   public interface RagCallback {
@@ -44,6 +45,9 @@ public class RagApi {
 
         // 打开连接
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(2000);
+        connection.setReadTimeout(3000);
+
         connection.setRequestMethod("GET");
 
         // 读取 API 响应
