@@ -17,6 +17,7 @@ public class LlamaHelper {
   static public String TAG = "LlamaHelper";
   static public LlamaHelper shared;
 
+
   LlamaContext lctx ;
   static public void init(Context c) {
     LlamaContext.ctx = c;
@@ -31,7 +32,8 @@ public class LlamaHelper {
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
       params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
 
-      String [] gguf_list = new String[] {"phi-2-super.Q4_K_M.gguf", "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
+      //  "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf",
+      String [] gguf_list = new String[] {"zephyr-7b-alpha.Q2_K.gguf","phi-2-super.Q4_K_M.gguf", "zephyr-7b-beta.Q4_0.gguf" };
       //String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
@@ -82,11 +84,6 @@ public class LlamaHelper {
     line += "";
 
     String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
-
-    if (RagApi.RagEnable){
-      preprompt = "Use the following pieces of context to answer the question at the end." +
-        "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n" ;
-    }
     String template = "<|system|>" + preprompt + "\n" +
       "</s>\n" +
       "<|user|>\n" +
@@ -109,9 +106,8 @@ public class LlamaHelper {
     WritableMap data = Arguments.createMap();
     line += "";
 
-    String preprompt = "Use the following pieces of context to answer the question at the end." +
-        "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n\n" ;
 
+    String preprompt = RagApi.RAG_PREPROMPT ;
     String template = "<|system|>" + preprompt + rag + "\n" +
       "</s>\n" +
       "<|user|>\n" +
@@ -123,7 +119,7 @@ public class LlamaHelper {
 
 
     ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
-    data.putArray("stop", stopString);
+    //data.putArray("stop", stopString);
     lctx.completion(data);
 
     return true ;

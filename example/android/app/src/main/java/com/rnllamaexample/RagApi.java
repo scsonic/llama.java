@@ -15,8 +15,13 @@ import java.net.URL;
 
 public class RagApi {
 
-  static boolean RagEnable = false ;
+  static boolean RagEnable = true ;
   //static boolean RagEnable = true ;
+
+  static public String RAG_PREPROMPT = "Use the following pieces of context to answer the question at the end." +
+    "If you don't know the answer, just say that you don't know, don't try to make up an answer.\n" ;
+
+
 
   // 定义回调接口
   public interface RagCallback {

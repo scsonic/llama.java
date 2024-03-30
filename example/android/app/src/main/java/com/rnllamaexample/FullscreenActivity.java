@@ -137,7 +137,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           @Override
           public void onSuccess(String response) {
             Log.e(TAG, "Rag Result=" + response);
-            lastRagContent = response ;
+            lastRagContent = RagApi.RAG_PREPROMPT +  response ;
             tvResponse.setText("RAG Response:\n" + response);
             TalkTask task = new TalkTask();
             task.execute(finalText, response);
@@ -370,9 +370,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       btnRag = findViewById(R.id.btnRag) ;
       btnRag.setOnClickListener((v)->{
         AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
-        builder.setTitle("Rag Result");
+        builder.setTitle("RAG Prompt");
         builder.setMessage(lastRagContent) ;
-        builder.show();
+        builder.setPositiveButton("OK", (d, i)->{
+          d.dismiss();
+        });
+        builder.create().show();
       });
       toggleRag();
 
@@ -562,7 +565,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       mAvatarPlayer.speak("file://" + path, EmotionType.happy, true);
     }
     catch (Exception ex){
-      Log.e(TAG, "Speak got exception") ;
+      Log.e(TAG, "Speak got exception", ex) ;
     }
   }
 
