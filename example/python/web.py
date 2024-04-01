@@ -15,12 +15,18 @@ print("end loading embeding");
 raw_documents = TextLoader('eos1100.txt').load()
 text_splitter = CharacterTextSplitter(chunk_size=256, chunk_overlap=0)
 print("return type=", type(text_splitter))
-
-print("split doc")
 documents = text_splitter.split_documents(raw_documents)
-print("put in FAISS")
-db = FAISS.from_documents(documents, embedding)
-print("FAISS END")
+
+VECTOR_DB_DIR = "faiss_index"
+if os.path.exists(VECTOR_DB_DIR):
+  print("load exist Vector DB")
+  db = FAISS.load_local(VECTOR_DB_DIR, embedding, allow_dangerous_deserialization=True)
+else:
+  print("create again, put into FAISS")
+  db = FAISS.from_documents(documents, embedding)
+  print("FAISS END")
+  db.save_local(VECTOR_DB_DIR)
+
 
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
