@@ -324,8 +324,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         ttsHelper = new TtsHelper(this);
         ttsHelper.cb = this;
 
+
         FrameLayout avatarLayout = findViewById(R.id.AvatarLayout);
       mAvatarPlayer = new AvatarPlayer(this, avatarLayout, this);
+      ttsHelper.player = mAvatarPlayer;
 
         //mAvatarPlayer.loadAvatar("https://models.readyplayer.me/656ee050869b42cd909818a8.glb");
 

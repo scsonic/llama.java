@@ -12,22 +12,68 @@ import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.hdb.avatar.AvatarPlayer;
+import com.hdb.avatar.EmotionType;
+import com.hdb.avatar.ModelHelper;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class TtsHelper {
+public class TtsHelper implements Runnable{
 
   static public String TAG = "TtsHelper";
 
   private TextToSpeech textToSpeech;
   private Context context;
+  String emptyPath = "" ;
+
+  Thread thread ;
+  boolean running = true ;
+  boolean isPlaying = false;
+  ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<String>() ;
+
 
   int fileCnt = 0;
   onDoneCallback cb ;
+  public AvatarPlayer player ;
+
+
+  public void sleep(int ms){
+    try {
+      Thread.sleep(ms) ;
+    } catch (InterruptedException e) {
+    }
+  }
+
+  @Override
+  public void run() {
+    while(running) {
+      if (queue.size() == 0 ) {
+        Log.e(TAG, "Queue is empty");
+        sleep(1000) ;
+      }
+      else {
+        if (!isPlaying) {
+          String path = queue.poll();
+          Log.e(TAG, "Queue Play :" + path) ;
+          playStoredWavFile(path);
+          if (player != null){
+            Log.e(TAG, "Queue speak:" + emptyPath) ;
+            player.speak("file://" + emptyPath, EmotionType.happy, false);
+          }
+        }
+        else {
+          Log.e(TAG, "Queue is not empty:" + queue.size() + " , but playing");
+          sleep(500) ;
+        }
+      }
+    }
+  }
 
   interface onDoneCallback {
     default void onDone(String path){
@@ -39,12 +85,16 @@ public class TtsHelper {
   public TtsHelper(Context context) {
     this.context = context;
     initializeTextToSpeech();
+    thread = new Thread(this) ;
+    thread.start() ;
   }
 
   private void initializeTextToSpeech() {
     textToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
       @Override
       public void onInit(int status) {
+        emptyPath = ModelHelper.copyRawFileToCache(context, R.raw.empty, "empty.wav");
+
         if (status == TextToSpeech.SUCCESS) {
 //          int result = textToSpeech.setLanguage(Locale.US);
 //
@@ -68,7 +118,7 @@ public class TtsHelper {
     // Set up file path
     //final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
     final File file = new File(context.getCacheDir(), fileName);
-    Log.e(TAG, "wav path=" + file.toString());
+   // Log.e(TAG, "wav path=" + file.toString() + " size:" + file.length());
     // Set up TTS parameters
     //HashMap<String, String> params = new HashMap<>();
     //params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, fileName);
@@ -90,9 +140,10 @@ public class TtsHelper {
           Log.e(TAG, "TTS Done:" + utteranceId + " FileSIze=" + wavFile.length());
           //playStoredWavFile(wavFile.getAbsolutePath());
           if ( cb != null ) {
-            cb.onDone(wavFile.getAbsolutePath());
+            //cb.onDone(wavFile.getAbsolutePath());
             //cb.onFail("Finish:" + utteranceId);
           }
+          queue.add(wavFile.getAbsolutePath());
 
         } catch (Exception e) {
           Log.e(TAG, "Write file fail", e) ;
@@ -122,6 +173,8 @@ public class TtsHelper {
   public void playStoredWavFile(String path){
     // 設定下載目錄下的 WAV 檔案路徑
     // 初始化 MediaPlayer
+
+    isPlaying = true ;
     MediaPlayer mediaPlayer = new MediaPlayer();
 
     try {
@@ -131,11 +184,13 @@ public class TtsHelper {
       mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
-          Log.i("MediaPlayer", "Playback completed");
+          Log.i("MediaPlayer", "Playback completed:" + path);
+          isPlaying = false;
         }
       });
     } catch (IOException e) {
-      Log.e("MediaPlayer", "Error setting data source", e);
+      Log.e("MediaPlayer", "Error setting data source:"+path, e);
+      isPlaying = false;
     }
   }
 
@@ -174,5 +229,6 @@ public class TtsHelper {
       textToSpeech.stop();
       textToSpeech.shutdown();
     }
+    running = false ;
   }
 }

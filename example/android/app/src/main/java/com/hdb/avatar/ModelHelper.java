@@ -74,13 +74,16 @@ public class ModelHelper {
 
       File jsonFile = new File(cacheDir, rawFileName.replace(".glb", ".json"));
 
-      FileOutputStream json_outputStream = new FileOutputStream(jsonFile);
-      String json_content = "{\"bodyType\":\"fullbody\",\"outfitGender\":\"feminine\",\"outfitVersion\":2,\"skinTone\":\"#ffd4b5\",\"createdAt\":\"2023-12-05T08:34:51.651Z\",\"updatedAt\":\"2023-12-18T11:48:24.499Z\"}";
-      byte[] jb = json_content.getBytes();
-      json_outputStream.write(jb, 0, jb.length);
-      json_outputStream.close();
-
-
+      if (jsonFile.getName().contains(".wav")){
+        // do not output wav
+      }
+      else {
+        FileOutputStream json_outputStream = new FileOutputStream(jsonFile);
+        String json_content = "{\"bodyType\":\"fullbody\",\"outfitGender\":\"feminine\",\"outfitVersion\":2,\"skinTone\":\"#ffd4b5\",\"createdAt\":\"2023-12-05T08:34:51.651Z\",\"updatedAt\":\"2023-12-18T11:48:24.499Z\"}";
+        byte[] jb = json_content.getBytes();
+        json_outputStream.write(jb, 0, jb.length);
+        json_outputStream.close();
+      }
 
         return outputFile.getAbsolutePath();
     } catch (IOException e) {
