@@ -387,8 +387,10 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
            @Override
            public void run() {
              super.run();
-             LlamaHelper.init(FullscreenActivity.this);
-             Log.e(TAG, "Module Init Success") ;
+             if (LlamaHelper.shared == null ) {
+               LlamaHelper.init(FullscreenActivity.this);
+               Log.e(TAG, "Module Init Success");
+             }
              mHandler.post(()->{
                btnSubmit.setEnabled(true);
              });
