@@ -37,7 +37,7 @@ public class LlamaContext {
 
 
 
-  public LlamaContext(int id, Context reactContext, Bundle params) {
+  public LlamaContext(int id, Bundle params) {
     if (LlamaContext.isArm64V8a() == false && LlamaContext.isX86_64() == false) {
       throw new IllegalStateException("Only 64-bit architectures are supported");
     }
@@ -74,9 +74,6 @@ public class LlamaContext {
       // float rope_freq_scale
       params.containsKey("rope_freq_scale") ? (float) params.getDouble("rope_freq_scale") : 0.0f
     );
-    if (reactContext == null){
-      Log.e(NAME, "has set context!") ;
-    }
   }
 
   public long getContext() {

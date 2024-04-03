@@ -52,7 +52,7 @@ public class RNLlama implements LifecycleEventListener {
       protected Bundle doInBackground(Void... voids) {
         try {
           int id = Math.abs(new Random().nextInt());
-          LlamaContext llamaContext = new LlamaContext(id, reactContext, params);
+          LlamaContext llamaContext = new LlamaContext(id, params);
           if (llamaContext.getContext() == 0) {
             throw new Exception("Failed to initialize context");
           }

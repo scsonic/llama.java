@@ -6,10 +6,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReadableArray;
+//import com.facebook.react.bridge.Arguments;
+//import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.rnllama.LlamaContext;
+//import com.rnllama.LlamaContext;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -47,13 +48,7 @@ public class LlamaHelper {
         }
       }
 
-      lctx = new LlamaContext(54321, null, params);
-      String prompt = "Transcript of a dialog, where the User interacts with an Assistant named Bob. Bob is helpful, kind, honest, good at writing, and never fails to answer the User's requests immediately and with precision.\n" +
-        "\n" +
-        "User: Hello, Bob.\n" +
-        "Bob: Hello. How may I help you today?";
-
-      String prompt2 = "You are a helpful assistant.";
+      lctx = new LlamaContext(54321, params);
       //talk(prompt2);
     }
 
@@ -117,7 +112,7 @@ public class LlamaHelper {
     data.putString(toUtf8("prompt"), toUtf8(template));
 
 
-    ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
+    //ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
     //data.putArray("stop", stopString);
     lctx.completion(data);
 
