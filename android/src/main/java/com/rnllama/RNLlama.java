@@ -1,6 +1,8 @@
 package com.rnllama;
 
 import androidx.annotation.NonNull;
+
+import android.os.Bundle;
 import android.util.Log;
 import android.os.Build;
 import android.os.Handler;
@@ -42,12 +44,12 @@ public class RNLlama implements LifecycleEventListener {
     promise.resolve(null);
   }
 
-  public void initContext(final ReadableMap params, final Promise promise) {
-    AsyncTask task = new AsyncTask<Void, Void, WritableMap>() {
+  public void initContext(final Bundle params, final Promise promise) {
+    AsyncTask task = new AsyncTask<Void, Void, Bundle>() {
       private Exception exception;
 
       @Override
-      protected WritableMap doInBackground(Void... voids) {
+      protected Bundle doInBackground(Void... voids) {
         try {
           int id = Math.abs(new Random().nextInt());
           LlamaContext llamaContext = new LlamaContext(id, reactContext, params);
@@ -55,7 +57,7 @@ public class RNLlama implements LifecycleEventListener {
             throw new Exception("Failed to initialize context");
           }
           contexts.put(id, llamaContext);
-          WritableMap result = Arguments.createMap();
+          Bundle result = new Bundle() ; //  Arguments.createMap();
           result.putInt("contextId", id);
           result.putBoolean("gpu", false);
           result.putString("reasonNoGPU", "Currently not supported");
@@ -67,7 +69,7 @@ public class RNLlama implements LifecycleEventListener {
       }
 
       @Override
-      protected void onPostExecute(WritableMap result) {
+      protected void onPostExecute(Bundle result) {
         if (exception != null) {
           promise.reject(exception);
           return;
@@ -91,8 +93,8 @@ public class RNLlama implements LifecycleEventListener {
           if (context == null) {
             throw new Exception("Context not found");
           }
-          WritableMap result = context.loadSession(path);
-          return result;
+          //WritableMap result = context.loadSession(path);
+          return null;
         } catch (Exception e) {
           exception = e;
         }
@@ -160,8 +162,8 @@ public class RNLlama implements LifecycleEventListener {
           if (context.isPredicting()) {
             throw new Exception("Context is busy");
           }
-          WritableMap result = context.completion(params);
-          return result;
+          //WritableMap result = context.completion(params);
+          return null;
         } catch (Exception e) {
           exception = e;
         }
@@ -232,7 +234,8 @@ public class RNLlama implements LifecycleEventListener {
           if (context == null) {
             throw new Exception("Context not found");
           }
-          return context.tokenize(text);
+          //return context.tokenize(text);
+          return null ;
         } catch (Exception e) {
           exception = e;
         }
@@ -264,7 +267,8 @@ public class RNLlama implements LifecycleEventListener {
           if (context == null) {
             throw new Exception("Context not found");
           }
-          return context.detokenize(tokens);
+          //return context.detokenize(tokens);
+          return null ;
         } catch (Exception e) {
           exception = e;
         }
@@ -296,7 +300,8 @@ public class RNLlama implements LifecycleEventListener {
           if (context == null) {
             throw new Exception("Context not found");
           }
-          return context.embedding(text);
+          //return context.embedding(text);
+          return null ;
         } catch (Exception e) {
           exception = e;
         }

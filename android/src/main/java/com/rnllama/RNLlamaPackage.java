@@ -18,7 +18,7 @@ public class RNLlamaPackage extends TurboReactPackage {
   @Nullable
   @Override
   public NativeModule getModule(String name, ReactApplicationContext reactContext) {
-    if (name.equals(RNLlamaModule.NAME)) {
+    if (name.equals(com.rnllama.RNLlamaModule.NAME)) {
       return new com.rnllama.RNLlamaModule(reactContext);
     } else {
       return null;
@@ -31,10 +31,10 @@ public class RNLlamaPackage extends TurboReactPackage {
       final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
       boolean isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
       moduleInfos.put(
-        RNLlamaModule.NAME,
+        com.rnllama.RNLlamaModule.NAME,
         new ReactModuleInfo(
-          RNLlamaModule.NAME,
-          RNLlamaModule.NAME,
+          com.rnllama.RNLlamaModule.NAME,
+          com.rnllama.RNLlamaModule.NAME,
           false, // canOverrideExistingModule
           false, // needsEagerInit
           true, // hasConstants

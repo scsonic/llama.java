@@ -2,6 +2,7 @@ package com.rnllamaexample;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -28,9 +29,7 @@ public class LlamaHelper {
 
   public LlamaHelper(){
     if (lctx == null) {
-      WritableMap params = Arguments.createMap();
-      params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
-      params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
+      Bundle params = new Bundle() ; // Arguments.createMap();
 
       //  "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf",
       String [] gguf_list = new String[] {"phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
@@ -80,7 +79,7 @@ public class LlamaHelper {
       Log.e(TAG, "is isPredicting, cancel");
       return false;
     }
-    WritableMap data = Arguments.createMap();
+    Bundle data = new Bundle() ; // Arguments.createMap();
     line += "";
 
     String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
@@ -103,7 +102,7 @@ public class LlamaHelper {
       Log.e(TAG, "is isPredicting, cancel");
       return false;
     }
-    WritableMap data = Arguments.createMap();
+    Bundle data = new Bundle() ; // Arguments.createMap();
     line += "";
 
 
@@ -119,7 +118,7 @@ public class LlamaHelper {
 
 
     ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
-    data.putArray("stop", stopString);
+    //data.putArray("stop", stopString);
     lctx.completion(data);
 
     return true ;
