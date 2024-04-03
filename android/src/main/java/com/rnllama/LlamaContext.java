@@ -5,7 +5,7 @@ package com.rnllama;
 //import com.facebook.react.bridge.WritableMap;
 //import com.facebook.react.bridge.ReadableMap;
 //import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReactApplicationContext;
+// import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.app.Application;
@@ -28,16 +28,16 @@ public class LlamaContext {
   private static final String NOTIFI_PART = "com.rnllama.send";
 
   private int id;
-  private ReactApplicationContext reactContext;
-  static public ReactApplicationContext sharedContext = null ;
+  // private ReactApplicationContext reactContext;
+  // static public ReactApplicationContext sharedContext = null ;
   static public Context ctx ;// ANdroid default ctx
   private long context;
   private int jobId = -1;
-  private DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
+  static public String BROADCAST_NAME = "LlamaJavaToken" ;
 
 
 
-  public LlamaContext(int id, ReactApplicationContext reactContext, Bundle params) {
+  public LlamaContext(int id, Context reactContext, Bundle params) {
     if (LlamaContext.isArm64V8a() == false && LlamaContext.isX86_64() == false) {
       throw new IllegalStateException("Only 64-bit architectures are supported");
     }
@@ -74,16 +74,8 @@ public class LlamaContext {
       // float rope_freq_scale
       params.containsKey("rope_freq_scale") ? (float) params.getDouble("rope_freq_scale") : 0.0f
     );
-    this.reactContext = reactContext;
-    if (sharedContext == null && reactContext != null){
-      sharedContext = reactContext ;
-    }
     if (reactContext == null){
-      this.reactContext = sharedContext;
       Log.e(NAME, "has set context!") ;
-    }
-    if (reactContext != null) {
-      eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
     }
   }
 
@@ -95,10 +87,6 @@ public class LlamaContext {
     Bundle event = new Bundle() ; // Arguments.createMap();
     event.putInt("contextId", LlamaContext.this.id);
     event.putBundle("tokenResult", tokenResult);
-
-    if (eventEmitter != null) {
-      eventEmitter.emit("@RNLlama_onToken", event);
-    }
   }
 
   private static class PartialCompletionCallback {
@@ -114,9 +102,6 @@ public class LlamaContext {
       Log.d("@@", "@@ TokenResult:" + tokenResult.toString());
 
       notifyPartString(tokenResult.getString("token"));
-
-      if (!emitNeeded) return;
-      context.emitPartialCompletion(tokenResult);
     }
   }
 
