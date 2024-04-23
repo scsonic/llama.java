@@ -189,10 +189,14 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       itemList.add("Select Background");
       itemList.add("Toggle Rag Mode, current=" + RagApi.RagEnable);
 
+      itemList.add("Test Play Audio(Avatar)");
+      itemList.add("Test Play Audio(MediaPlayer)");
+
       // 创建AlertDialog.Builder
       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
       builder.setTitle("Select Function");
 
+      String testWav = ModelHelper.copyRawFileToCache(getApplicationContext(), R.raw.beep, "beep.wav");
       // 设置列表适配器
       ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(FullscreenActivity.this, android.R.layout.simple_list_item_1, itemList);
       builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
@@ -212,6 +216,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
             toggleRag();
 //            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
 //            startActivity(i);
+          }
+          else if (which == 3 ){
+            mAvatarPlayer.speak("file://" + testWav, EmotionType.happy, false);
+          }
+          else if (which == 4 ) {
+            ttsHelper.playStoredWavFile(testWav);
           }
         }
       });

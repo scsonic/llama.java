@@ -43,7 +43,7 @@ public class LlamaHelper {
         if (f.exists()){
           params.putString("model", path);
           Log.e(TAG, "Using model:" + path);
-          Common.Toast("Using Model: " + file);
+          //Common.Toast("Using Model: " + file);
           break;
         }
       }

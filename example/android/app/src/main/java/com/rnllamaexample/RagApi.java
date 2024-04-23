@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class RagApi {
 
-  static boolean RagEnable = true ;
+  static boolean RagEnable = false ;
   //static boolean RagEnable = true ;
 
   static public String RAG_PREPROMPT = "Use the following pieces of context to answer the question at the end." +

@@ -85,8 +85,8 @@ public class TtsHelper implements Runnable{
   public TtsHelper(Context context) {
     this.context = context;
     initializeTextToSpeech();
-    thread = new Thread(this) ;
-    thread.start() ;
+    //thread = new Thread(this) ;
+    //thread.start() ;
   }
 
   private void initializeTextToSpeech() {
@@ -140,10 +140,10 @@ public class TtsHelper implements Runnable{
           Log.e(TAG, "TTS Done:" + utteranceId + " FileSIze=" + wavFile.length());
           //playStoredWavFile(wavFile.getAbsolutePath());
           if ( cb != null ) {
-            //cb.onDone(wavFile.getAbsolutePath());
+            cb.onDone(wavFile.getAbsolutePath());
             //cb.onFail("Finish:" + utteranceId);
           }
-          queue.add(wavFile.getAbsolutePath());
+          //queue.add(wavFile.getAbsolutePath());
 
         } catch (Exception e) {
           Log.e(TAG, "Write file fail", e) ;
