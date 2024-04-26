@@ -33,7 +33,7 @@ public class LlamaHelper {
       Bundle params = new Bundle() ; // Arguments.createMap();
 
       //  "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf",
-      String [] gguf_list = new String[] {"phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
+      String [] gguf_list = new String[] {"Phi-3-mini-4k-instruct-q4.gguf", "phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
       //String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
