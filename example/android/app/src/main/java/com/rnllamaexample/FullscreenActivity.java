@@ -54,6 +54,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   static public String TAG = "FSA" ;
 
 
+  boolean testToggle = false;
     private final Handler mHandler = new Handler(Looper.myLooper());
     ImageButton btnSubmit ;
     ImageButton btnStop ;
@@ -121,13 +122,14 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       String text = etInput.getText().toString();
       if (BuildConfig.DEBUG) {
         if (text.length() == 0) {
-          int a = (int) (System.currentTimeMillis() % 10);
-          int b = (int) ((System.currentTimeMillis() * 12345 + 321) % 10);
-          text = String.format("%d + %d = ", a, b);
 
-          if (RagApi.RagEnable){
-            text = "How can i replace battery";
+          if (testToggle) {
+            text = "I will like to build a 20 sqrt ft balcony, can you give me a list of materials and the price estimation ?";
           }
+          else {
+            text = "What kind of drill bits I need to drill a bathroom tile ?" ;
+          }
+          testToggle = !testToggle ;
         }
         etInput.setText(text, null);
       }

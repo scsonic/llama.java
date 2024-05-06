@@ -17,6 +17,7 @@
 
   <FrameLayout
     android:id="@+id/AvatarLayout"
+    android:layout_marginTop="100dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_above="@id/llResponse"
@@ -43,7 +44,7 @@
     <TextView
       android:id="@+id/tvResponse"
       android:layout_width="match_parent"
-      android:layout_height="80dp"
+      android:layout_height="120dp"
       android:scrollbars = "vertical"
       android:textSize="14sp"
       android:padding="5dp"
