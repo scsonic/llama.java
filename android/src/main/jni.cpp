@@ -22,96 +22,101 @@ static inline int min(int a, int b) {
 }
 
 extern "C" {
-
-// Method to create WritableMap
+// Method to create Bundle (previously WritableMap)
 static inline jobject createWriteableMap(JNIEnv *env) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/Arguments");
-    jmethodID init = env->GetStaticMethodID(mapClass, "createMap", "()Lcom/facebook/react/bridge/WritableMap;");
-    jobject map = env->CallStaticObjectMethod(mapClass, init);
-    return map;
+    jclass bundleClass = env->FindClass("android/os/Bundle");
+    jmethodID init = env->GetMethodID(bundleClass, "<init>", "()V");
+    jobject bundle = env->NewObject(bundleClass, init);
+    return bundle;
 }
 
-// Method to put string into WritableMap
-static inline void putString(JNIEnv *env, jobject map, const char *key, const char *value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableMap");
-    jmethodID putStringMethod = env->GetMethodID(mapClass, "putString", "(Ljava/lang/String;Ljava/lang/String;)V");
+// Method to put string into Bundle (previously putString)
+static inline void putString(JNIEnv *env, jobject bundle, const char *key, const char *value) {
+    jclass bundleClass = env->FindClass("android/os/Bundle");
+    jmethodID putStringMethod = env->GetMethodID(bundleClass, "putString", "(Ljava/lang/String;Ljava/lang/String;)V");
 
     jstring jKey = env->NewStringUTF(key);
     jstring jValue = env->NewStringUTF(value);
 
-    env->CallVoidMethod(map, putStringMethod, jKey, jValue);
+    env->CallVoidMethod(bundle, putStringMethod, jKey, jValue);
 }
 
-// Method to put int into WritableMap
-static inline void putInt(JNIEnv *env, jobject map, const char *key, int value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableMap");
-    jmethodID putIntMethod = env->GetMethodID(mapClass, "putInt", "(Ljava/lang/String;I)V");
+// Method to put int into Bundle (previously putInt)
+static inline void putInt(JNIEnv *env, jobject bundle, const char *key, int value) {
+    jclass bundleClass = env->FindClass("android/os/Bundle");
+    jmethodID putIntMethod = env->GetMethodID(bundleClass, "putInt", "(Ljava/lang/String;I)V");
 
     jstring jKey = env->NewStringUTF(key);
 
-    env->CallVoidMethod(map, putIntMethod, jKey, value);
+    env->CallVoidMethod(bundle, putIntMethod, jKey, value);
 }
 
-// Method to put double into WritableMap
-static inline void putDouble(JNIEnv *env, jobject map, const char *key, double value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableMap");
-    jmethodID putDoubleMethod = env->GetMethodID(mapClass, "putDouble", "(Ljava/lang/String;D)V");
+// Method to put double into Bundle (previously putDouble)
+static inline void putDouble(JNIEnv *env, jobject bundle, const char *key, double value) {
+    jclass bundleClass = env->FindClass("android/os/Bundle");
+    jmethodID putDoubleMethod = env->GetMethodID(bundleClass, "putDouble", "(Ljava/lang/String;D)V");
 
     jstring jKey = env->NewStringUTF(key);
 
-    env->CallVoidMethod(map, putDoubleMethod, jKey, value);
+    env->CallVoidMethod(bundle, putDoubleMethod, jKey, value);
 }
 
-// Method to put WriteableMap into WritableMap
-static inline void putMap(JNIEnv *env, jobject map, const char *key, jobject value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableMap");
-    jmethodID putMapMethod = env->GetMethodID(mapClass, "putMap", "(Ljava/lang/String;Lcom/facebook/react/bridge/ReadableMap;)V");
+// Method to put Bundle into Bundle (previously putMap)
+static inline void putMap(JNIEnv *env, jobject bundle, const char *key, jobject value) {
+    jclass bundleClass = env->FindClass("android/os/Bundle");
+    jmethodID putBundleMethod = env->GetMethodID(bundleClass, "putBundle", "(Ljava/lang/String;Landroid/os/Bundle;)V");
 
     jstring jKey = env->NewStringUTF(key);
 
-    env->CallVoidMethod(map, putMapMethod, jKey, value);
+    env->CallVoidMethod(bundle, putBundleMethod, jKey, value);
 }
 
-// Method to create WritableArray
+// Method to create ArrayList (previously WritableArray)
 static inline jobject createWritableArray(JNIEnv *env) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/Arguments");
-    jmethodID init = env->GetStaticMethodID(mapClass, "createArray", "()Lcom/facebook/react/bridge/WritableArray;");
-    jobject map = env->CallStaticObjectMethod(mapClass, init);
-    return map;
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID init = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jobject arrayList = env->NewObject(arrayListClass, init);
+    return arrayList;
 }
 
-// Method to push int into WritableArray
-static inline void pushInt(JNIEnv *env, jobject arr, int value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableArray");
-    jmethodID pushIntMethod = env->GetMethodID(mapClass, "pushInt", "(I)V");
+// Method to push int into ArrayList (previously pushInt)
+static inline void pushInt(JNIEnv *env, jobject arrayList, int value) {
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    env->CallVoidMethod(arr, pushIntMethod, value);
+    jmethodID integerInit = env->GetMethodID(env->FindClass("java/lang/Integer"), "<init>", "(I)V");
+    jobject intValue = env->NewObject(env->FindClass("java/lang/Integer"), integerInit, value);
+
+    env->CallBooleanMethod(arrayList, addMethod, intValue);
 }
 
-// Method to push double into WritableArray
-static inline void pushDouble(JNIEnv *env, jobject arr, double value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableArray");
-    jmethodID pushDoubleMethod = env->GetMethodID(mapClass, "pushDouble", "(D)V");
+// Method to push double into ArrayList (previously pushDouble)
+static inline void pushDouble(JNIEnv *env, jobject arrayList, double value) {
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    env->CallVoidMethod(arr, pushDoubleMethod, value);
+    jmethodID doubleInit = env->GetMethodID(env->FindClass("java/lang/Double"), "<init>", "(D)V");
+    jobject doubleValue = env->NewObject(env->FindClass("java/lang/Double"), doubleInit, value);
+
+    env->CallBooleanMethod(arrayList, addMethod, doubleValue);
 }
 
-// Method to push WritableMap into WritableArray
-static inline void pushMap(JNIEnv *env, jobject arr, jobject value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableArray");
-    jmethodID pushMapMethod = env->GetMethodID(mapClass, "pushMap", "(Lcom/facebook/react/bridge/WritableMap;)V");
+// Method to push Bundle into ArrayList (previously pushMap)
+static inline void pushMap(JNIEnv *env, jobject arrayList, jobject value) {
+    jclass arrayListClass = env->FindClass("java/util/ArrayList");
+    jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    env->CallVoidMethod(arr, pushMapMethod, value);
+    env->CallBooleanMethod(arrayList, addMethod, value);
 }
 
-// Method to put WritableArray into WritableMap
-static inline void putArray(JNIEnv *env, jobject map, const char *key, jobject value) {
-    jclass mapClass = env->FindClass("com/facebook/react/bridge/WritableMap");
-    jmethodID putArrayMethod = env->GetMethodID(mapClass, "putArray", "(Ljava/lang/String;Lcom/facebook/react/bridge/ReadableArray;)V");
+// Method to put ArrayList into Bundle (previously putArray)
+static inline void putArray(JNIEnv *env, jobject bundle, const char *key, jobject arrayList) {
+    jclass bundleClass = env->FindClass("android/os/Bundle");
+    jmethodID putParcelableArrayListMethod = env->GetMethodID(bundleClass, "putParcelableArrayList", "(Ljava/lang/String;Ljava/util/ArrayList;)V");
 
     jstring jKey = env->NewStringUTF(key);
 
-    env->CallVoidMethod(map, putArrayMethod, jKey, value);
+    env->CallVoidMethod(bundle, putParcelableArrayListMethod, jKey, arrayList);
 }
 
 
@@ -428,7 +433,9 @@ Java_com_rnllama_LlamaContext_doCompletion(
             }
 
             jclass cb_class = env->GetObjectClass(partial_completion_callback);
-            jmethodID onPartialCompletion = env->GetMethodID(cb_class, "onPartialCompletion", "(Lcom/facebook/react/bridge/WritableMap;)V");
+//            jmethodID onPartialCompletion = env->GetMethodID(cb_class, "onPartialCompletion", "(Lcom/facebook/react/bridge/WritableMap;)V");
+            jmethodID onPartialCompletion = env->GetMethodID(cb_class, "onPartialCompletion", "(Landroid/os/Bundle;)V");
+
             env->CallVoidMethod(partial_completion_callback, onPartialCompletion, tokenResult);
         }
     }

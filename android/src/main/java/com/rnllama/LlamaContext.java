@@ -1,16 +1,17 @@
 package com.rnllama;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReactApplicationContext;
+//import com.facebook.react.bridge.Arguments;
+//import com.facebook.react.bridge.WritableArray;
+//import com.facebook.react.bridge.WritableMap;
+//import com.facebook.react.bridge.ReadableMap;
+//import com.facebook.react.bridge.ReadableArray;
+// import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.os.Build;
 import android.content.res.AssetManager;
@@ -20,26 +21,27 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class LlamaContext {
   public static final String NAME = "RNLlamaContext";
   private static final String NOTIFI_PART = "com.rnllama.send";
 
   private int id;
-  private ReactApplicationContext reactContext;
-  static public ReactApplicationContext sharedContext = null ;
+  // private ReactApplicationContext reactContext;
+  // static public ReactApplicationContext sharedContext = null ;
   static public Context ctx ;// ANdroid default ctx
   private long context;
   private int jobId = -1;
-  private DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
+  static public String BROADCAST_NAME = "LlamaJavaToken" ;
 
 
 
-  public LlamaContext(int id, ReactApplicationContext reactContext, ReadableMap params) {
+  public LlamaContext(int id, Bundle params) {
     if (LlamaContext.isArm64V8a() == false && LlamaContext.isX86_64() == false) {
       throw new IllegalStateException("Only 64-bit architectures are supported");
     }
-    if (!params.hasKey("model")) {
+    if (!params.containsKey("model")) {
       throw new IllegalArgumentException("Missing required parameter: model");
     }
 
@@ -48,55 +50,40 @@ public class LlamaContext {
       // String model,
       params.getString("model"),
       // boolean embedding,
-      params.hasKey("embedding") ? params.getBoolean("embedding") : false,
+      params.containsKey("embedding") ? params.getBoolean("embedding") : false,
       // int n_ctx,
-      params.hasKey("n_ctx") ? params.getInt("n_ctx") : 2048,
+      params.containsKey("n_ctx") ? params.getInt("n_ctx") : 2048,
       // int n_batch,
-      params.hasKey("n_batch") ? params.getInt("n_batch") : 256,
+      params.containsKey("n_batch") ? params.getInt("n_batch") : 256,
       // int n_threads,
-      params.hasKey("n_threads") ? params.getInt("n_threads") : 4,
+      params.containsKey("n_threads") ? params.getInt("n_threads") : 4,
       // int n_gpu_layers, // TODO: Support this
-      params.hasKey("n_gpu_layers") ? params.getInt("n_gpu_layers") : 0,
+      params.containsKey("n_gpu_layers") ? params.getInt("n_gpu_layers") : 0,
       // boolean use_mlock,
-      params.hasKey("use_mlock") ? params.getBoolean("use_mlock") : true,
+      params.containsKey("use_mlock") ? params.getBoolean("use_mlock") : true,
       // boolean use_mmap,
-      params.hasKey("use_mmap") ? params.getBoolean("use_mmap") : true,
+      params.containsKey("use_mmap") ? params.getBoolean("use_mmap") : true,
       // String lora,
-      params.hasKey("lora") ? params.getString("lora") : "",
+      params.containsKey("lora") ? params.getString("lora") : "",
       // float lora_scaled,
-      params.hasKey("lora_scaled") ? (float) params.getDouble("lora_scaled") : 1.0f,
+      params.containsKey("lora_scaled") ? (float) params.getDouble("lora_scaled") : 1.0f,
       // String lora_base,
-      params.hasKey("lora_base") ? params.getString("lora_base") : "",
+      params.containsKey("lora_base") ? params.getString("lora_base") : "",
       // float rope_freq_base,
-      params.hasKey("rope_freq_base") ? (float) params.getDouble("rope_freq_base") : 0.0f,
+      params.containsKey("rope_freq_base") ? (float) params.getDouble("rope_freq_base") : 0.0f,
       // float rope_freq_scale
-      params.hasKey("rope_freq_scale") ? (float) params.getDouble("rope_freq_scale") : 0.0f
+      params.containsKey("rope_freq_scale") ? (float) params.getDouble("rope_freq_scale") : 0.0f
     );
-    this.reactContext = reactContext;
-    if (sharedContext == null && reactContext != null){
-      sharedContext = reactContext ;
-    }
-    if (reactContext == null){
-      this.reactContext = sharedContext;
-      Log.e(NAME, "has set context!") ;
-    }
-    if (reactContext != null) {
-      eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
-    }
   }
 
   public long getContext() {
     return context;
   }
 
-  private void emitPartialCompletion(WritableMap tokenResult) {
-    WritableMap event = Arguments.createMap();
+  private void emitPartialCompletion(Bundle tokenResult) {
+    Bundle event = new Bundle() ; // Arguments.createMap();
     event.putInt("contextId", LlamaContext.this.id);
-    event.putMap("tokenResult", tokenResult);
-
-    if (eventEmitter != null) {
-      eventEmitter.emit("@RNLlama_onToken", event);
-    }
+    event.putBundle("tokenResult", tokenResult);
   }
 
   private static class PartialCompletionCallback {
@@ -108,17 +95,14 @@ public class LlamaContext {
       this.emitNeeded = emitNeeded;
     }
 
-    void onPartialCompletion(WritableMap tokenResult) {
+    void onPartialCompletion(Bundle tokenResult) {
       Log.d("@@", "@@ TokenResult:" + tokenResult.toString());
 
       notifyPartString(tokenResult.getString("token"));
-
-      if (!emitNeeded) return;
-      context.emitPartialCompletion(tokenResult);
     }
   }
 
-  public WritableMap loadSession(String path) {
+  public Bundle loadSession(String path) {
     if (path == null || path.isEmpty()) {
       throw new IllegalArgumentException("File path is empty");
     }
@@ -126,8 +110,8 @@ public class LlamaContext {
     if (!file.exists()) {
       throw new IllegalArgumentException("File does not exist: " + path);
     }
-    WritableMap result = loadSession(this.context, path);
-    if (result.hasKey("error")) {
+    Bundle result = loadSession(this.context, path);
+    if (result.containsKey("error")) {
       throw new IllegalStateException(result.getString("error"));
     }
     return result;
@@ -140,23 +124,24 @@ public class LlamaContext {
     return saveSession(this.context, path, size);
   }
 
-  public WritableMap completion(ReadableMap params) {
-    if (!params.hasKey("prompt")) {
+  public Bundle completion(Bundle params) {
+    if (!params.containsKey("prompt")) {
       throw new IllegalArgumentException("Missing required parameter: prompt");
     }
 
     double[][] logit_bias = new double[0][0];
-    if (params.hasKey("logit_bias")) {
-      ReadableArray logit_bias_array = params.getArray("logit_bias");
-      logit_bias = new double[logit_bias_array.size()][];
-      for (int i = 0; i < logit_bias_array.size(); i++) {
-        ReadableArray logit_bias_row = logit_bias_array.getArray(i);
-        logit_bias[i] = new double[logit_bias_row.size()];
-        for (int j = 0; j < logit_bias_row.size(); j++) {
-          logit_bias[i][j] = logit_bias_row.getDouble(j);
-        }
-      }
-    }
+//    if (params.containsKey("logit_bias")) {
+//      //ArrayList<Double[]> logitBiasArrayList = params.getParcelableArrayList("logit_bias");
+//      ArrayList<ArrayList<Double>> logitBiasArrayList = params.getParcelableArrayList("logit_bias");
+//      logit_bias = new double[logitBiasArrayList.size()][];
+//      for (int i = 0; i < logitBiasArrayList.size(); i++) {
+//        Double[] logitBiasRow = logitBiasArrayList.get(i);
+//        logit_bias[i] = new double[logitBiasRow.length];
+//        for (int j = 0; j < logitBiasRow.length; j++) {
+//          logit_bias[i][j] = logitBiasRow[j];
+//        }
+//      }
+//    }
 
     String[] stops = {"</s>"};
 
@@ -165,53 +150,53 @@ public class LlamaContext {
       // String prompt,
       params.getString("prompt"),
       // String grammar,
-      params.hasKey("grammar") ? params.getString("grammar") : "",
+      params.containsKey("grammar") ? params.getString("grammar") : "",
       // float temperature,
-      params.hasKey("temperature") ? (float) params.getDouble("temperature") : 0.7f,
+      params.containsKey("temperature") ? params.getFloat("temperature") : 0.7f,
       // int n_threads,
-      params.hasKey("n_threads") ? params.getInt("n_threads") : 4,
+      params.containsKey("n_threads") ? params.getInt("n_threads") : 4,
       // int n_predict,
-      params.hasKey("n_predict") ? params.getInt("n_predict") : 128,
+      params.containsKey("n_predict") ? params.getInt("n_predict") : 128,
       // int n_probs,
-      params.hasKey("n_probs") ? params.getInt("n_probs") : 0,
+      params.containsKey("n_probs") ? params.getInt("n_probs") : 0,
       // int penalty_last_n,
-      params.hasKey("penalty_last_n") ? params.getInt("penalty_last_n") : 64,
+      params.containsKey("penalty_last_n") ? params.getInt("penalty_last_n") : 64,
       // float penalty_repeat,
-      params.hasKey("penalty_repeat") ? (float) params.getDouble("penalty_repeat") : 1.30f,
+      params.containsKey("penalty_repeat") ? params.getFloat("penalty_repeat") : 1.30f,
       // float penalty_freq,
-      params.hasKey("penalty_freq") ? (float) params.getDouble("penalty_freq") : 0.00f,
+      params.containsKey("penalty_freq") ? params.getFloat("penalty_freq") : 0.00f,
       // float penalty_present,
-      params.hasKey("penalty_present") ? (float) params.getDouble("penalty_present") : 0.00f,
+      params.containsKey("penalty_present") ? params.getFloat("penalty_present") : 0.00f,
       // float mirostat,
-      params.hasKey("mirostat") ? (float) params.getDouble("mirostat") : 0.00f,
+      params.containsKey("mirostat") ? params.getFloat("mirostat") : 0.00f,
       // float mirostat_tau,
-      params.hasKey("mirostat_tau") ? (float) params.getDouble("mirostat_tau") : 5.00f,
+      params.containsKey("mirostat_tau") ? params.getFloat("mirostat_tau") : 5.00f,
       // float mirostat_eta,
-      params.hasKey("mirostat_eta") ? (float) params.getDouble("mirostat_eta") : 0.10f,
+      params.containsKey("mirostat_eta") ? params.getFloat("mirostat_eta") : 0.10f,
       // boolean penalize_nl,
-      params.hasKey("penalize_nl") ? params.getBoolean("penalize_nl") : true,
+      params.containsKey("penalize_nl") ? params.getBoolean("penalize_nl") : true,
       // int top_k,
-      params.hasKey("top_k") ? params.getInt("top_k") : 40,
+      params.containsKey("top_k") ? params.getInt("top_k") : 40,
       // float top_p,
-      params.hasKey("top_p") ? (float) params.getDouble("top_p") : 0.80f,
+      params.containsKey("top_p") ? params.getFloat("top_p") : 0.80f,
       // float min_p,
-      params.hasKey("min_p") ? (float) params.getDouble("min_p") : 0.05f,
+      params.containsKey("min_p") ? params.getFloat("min_p") : 0.05f,
       // float tfs_z,
-      params.hasKey("tfs_z") ? (float) params.getDouble("tfs_z") : 1.00f,
+      params.containsKey("tfs_z") ? params.getFloat("tfs_z") : 1.00f,
       // float typical_p,
-      params.hasKey("typical_p") ? (float) params.getDouble("typical_p") : 1.00f,
+      params.containsKey("typical_p") ? params.getFloat("typical_p") : 1.00f,
       // int seed,
-      params.hasKey("seed") ? params.getInt("seed") : -1,
+      params.containsKey("seed") ? params.getInt("seed") : -1,
       // String[] stop,
-      params.hasKey("stop") ? params.getArray("stop").toArrayList().toArray(new String[0]) : new String[0],
+      params.containsKey("stop") ? params.getStringArray("stop") : new String[0],
       // boolean ignore_eos,
-      params.hasKey("ignore_eos") ? params.getBoolean("ignore_eos") : false,
+      params.containsKey("ignore_eos") ? params.getBoolean("ignore_eos") : false,
       // double[][] logit_bias,
       logit_bias,
       // PartialCompletionCallback partial_completion_callback
       new PartialCompletionCallback(
         this,
-        params.hasKey("emit_partial_completion") ? params.getBoolean("emit_partial_completion") : true
+        params.containsKey("emit_partial_completion") ? params.getBoolean("emit_partial_completion") : true
       )
     );
   }
@@ -234,26 +219,26 @@ public class LlamaContext {
     return isPredicting(this.context);
   }
 
-  public WritableMap tokenize(String text) {
-    WritableMap result = Arguments.createMap();
-    result.putArray("tokens", tokenize(this.context, text));
+  public Bundle tokenize(String text) {
+    Bundle result = new Bundle() ; // Arguments.createMap();
+    //result.putBundle("tokens", tokenize(this.context, text));
     return result;
   }
 
-  public String detokenize(ReadableArray tokens) {
+  public String detokenize(ArrayList<Double> tokens) {
     int[] toks = new int[tokens.size()];
     for (int i = 0; i < tokens.size(); i++) {
-      toks[i] = (int) tokens.getDouble(i);
+      toks[i] = (int) ((double)tokens.get(i));
     }
     return detokenize(this.context, toks);
   }
 
-  public WritableMap embedding(String text) {
+  public Bundle embedding(String text) {
     if (isEmbeddingEnabled(this.context) == false) {
       throw new IllegalStateException("Embedding is not enabled");
     }
-    WritableMap result = Arguments.createMap();
-    result.putArray("embedding", embedding(this.context, text));
+    Bundle result =  new Bundle() ; //.createMap();
+    //result.putBundle("embedding", embedding(this.context, text));
     return result;
   }
 
@@ -273,9 +258,9 @@ public class LlamaContext {
         // ARMv8.2a needs runtime detection support
         String cpuInfo = LlamaContext.cpuInfo();
         if (cpuInfo != null) {
-          Log.d(NAME, "CPU info: " + cpuInfo);
+          Log.e(NAME, "CPU info: " + cpuInfo);
           if (cpuInfo.contains("fphp")) {
-            Log.d(NAME, "CPU supports fp16 arithmetic");
+            Log.e(NAME, "CPU supports fp16 arithmetic");
             loadV8fp16 = true;
           }
         }
@@ -334,7 +319,7 @@ public class LlamaContext {
     float rope_freq_base,
     float rope_freq_scale
   );
-  protected static native WritableMap loadSession(
+  protected static native Bundle loadSession(
     long contextPtr,
     String path
   );
@@ -343,7 +328,7 @@ public class LlamaContext {
     String path,
     int size
   );
-  protected static native WritableMap doCompletion(
+  protected static native Bundle doCompletion(
     long context_ptr,
     String prompt,
     String grammar,
@@ -372,10 +357,10 @@ public class LlamaContext {
   );
   protected static native void stopCompletion(long contextPtr);
   protected static native boolean isPredicting(long contextPtr);
-  protected static native WritableArray tokenize(long contextPtr, String text);
+  //protected static native WritableArray tokenize(long contextPtr, String text);
   protected static native String detokenize(long contextPtr, int[] tokens);
   protected static native boolean isEmbeddingEnabled(long contextPtr);
-  protected static native WritableArray embedding(long contextPtr, String text);
+  //protected static native WritableArray embedding(long contextPtr, String text);
   protected static native String bench(long contextPtr, int pp, int tg, int pl, int nr);
   protected static native void freeContext(long contextPtr);
 }

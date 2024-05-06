@@ -2,13 +2,15 @@ package com.rnllamaexample;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReadableArray;
+//import com.facebook.react.bridge.Arguments;
+//import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.rnllama.LlamaContext;
+//import com.rnllama.LlamaContext;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -28,12 +30,10 @@ public class LlamaHelper {
 
   public LlamaHelper(){
     if (lctx == null) {
-      WritableMap params = Arguments.createMap();
-      params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/1000001958.gguf");
-      params.putString("model", "/data/user/0/com.rnllamaexample/cache/models/msf%3A1000001958.gguf");
+      Bundle params = new Bundle() ; // Arguments.createMap();
 
       //  "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf",
-      String [] gguf_list = new String[] {"phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
+      String [] gguf_list = new String[] {"Phi-3-mini-4k-instruct-q4.gguf", "phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
       //String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
 
@@ -48,13 +48,7 @@ public class LlamaHelper {
         }
       }
 
-      lctx = new LlamaContext(54321, null, params);
-      String prompt = "Transcript of a dialog, where the User interacts with an Assistant named Bob. Bob is helpful, kind, honest, good at writing, and never fails to answer the User's requests immediately and with precision.\n" +
-        "\n" +
-        "User: Hello, Bob.\n" +
-        "Bob: Hello. How may I help you today?";
-
-      String prompt2 = "You are a helpful assistant.";
+      lctx = new LlamaContext(54321, params);
       //talk(prompt2);
     }
 
@@ -80,7 +74,7 @@ public class LlamaHelper {
       Log.e(TAG, "is isPredicting, cancel");
       return false;
     }
-    WritableMap data = Arguments.createMap();
+    Bundle data = new Bundle() ; // Arguments.createMap();
     line += "";
 
     String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
@@ -103,7 +97,7 @@ public class LlamaHelper {
       Log.e(TAG, "is isPredicting, cancel");
       return false;
     }
-    WritableMap data = Arguments.createMap();
+    Bundle data = new Bundle() ; // Arguments.createMap();
     line += "";
 
 
@@ -118,8 +112,8 @@ public class LlamaHelper {
     data.putString(toUtf8("prompt"), toUtf8(template));
 
 
-    ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
-    data.putArray("stop", stopString);
+    //ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
+    //data.putArray("stop", stopString);
     lctx.completion(data);
 
     return true ;
