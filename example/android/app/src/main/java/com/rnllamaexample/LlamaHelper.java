@@ -19,6 +19,7 @@ public class LlamaHelper {
   static public String TAG = "LlamaHelper";
   static public LlamaHelper shared;
 
+  String model_file_name = "" ;
 
   LlamaContext lctx ;
   static public void init(Context c) {
@@ -42,6 +43,7 @@ public class LlamaHelper {
         File f = new File(path);
         if (f.exists()){
           params.putString("model", path);
+          model_file_name = file ;
           Log.e(TAG, "Using model:" + path);
           //Common.Toast("Using Model: " + file);
           break;
@@ -78,14 +80,23 @@ public class LlamaHelper {
     line += "";
 
     String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
-    String template = "<|system|>" + preprompt + "\n" +
+
+    String template = "<|user|>" + preprompt + "\n" +
       "</s>\n" +
       "<|user|>\n" +
       line + "</s>\n" +
       "<|assistant|>";
 
+    if (model_file_name.contains("Phi")){
+      // change to phi3 format
+      template = "<|system|>\n" + preprompt + "<|end|>\n<|user|>\n" + line + " <|end|>\n" +
+        "<|assistant|>";
+    }
+
+
     Log.e(TAG, "talk:" + template);
     data.putString(toUtf8("prompt"), toUtf8(template));
+    Log.e(TAG, toUtf8(template));
     lctx.completion(data);
 
     return true ;
