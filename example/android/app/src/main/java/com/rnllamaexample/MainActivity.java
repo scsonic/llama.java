@@ -22,8 +22,7 @@ public class MainActivity extends ReactActivity {
   @Override
   protected void onResume() {
     super.onResume();
-    Intent intent = new Intent(this, FullscreenActivity.class);
-    startActivity(intent);
+
   }
 
   /**

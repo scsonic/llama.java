@@ -19,7 +19,7 @@ public class LlamaHelper {
   static public String TAG = "LlamaHelper";
   static public LlamaHelper shared;
 
-  String model_file_name = "" ;
+  static public String model_file_name = "" ;
 
   LlamaContext lctx ;
   static public void init(Context c) {
@@ -34,19 +34,21 @@ public class LlamaHelper {
       Bundle params = new Bundle() ; // Arguments.createMap();
 
       //  "rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf",
-      String [] gguf_list = new String[] {"Phi-3-mini-4k-instruct-q4.gguf", "phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
+      String [] gguf_list = new String[] {model_file_name, "Phi-3-mini-4k-instruct-q4.gguf", "phi-2-super.Q4_K_M.gguf","zephyr-7b-beta.Q4_0.gguf","zephyr-7b-alpha.Q2_K.gguf"};
       //String [] gguf_list = new String[] {"rocket-3b.Q4_0.gguf", "rocket-3b.Q2_K.gguf", "zephyr-7b-beta.Q4_0.gguf", "zephyr-7b-alpha.Q2_K.gguf",};
       String dir = "/sdcard/Download/" ;
-
-      for (String file : gguf_list){
-        String path = dir + file ;
+      for (String file : gguf_list) {
+        String path = dir + file;
         File f = new File(path);
-        if (f.exists()){
+        if (f.exists() && f.isFile()) {
           params.putString("model", path);
-          model_file_name = file ;
+          model_file_name = file;
           Log.e(TAG, "Using model:" + path);
           //Common.Toast("Using Model: " + file);
           break;
+        }
+        else {
+          Log.e(TAG, "Model file:" + file + " is not exist");
         }
       }
 

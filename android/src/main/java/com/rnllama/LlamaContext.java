@@ -143,7 +143,7 @@ public class LlamaContext {
 //      }
 //    }
 
-    String[] stops = {"</s>"};
+    String[] stops = {"</s>", "<|end|>"};
 
     return doCompletion(
       this.context,
@@ -188,7 +188,7 @@ public class LlamaContext {
       // int seed,
       params.containsKey("seed") ? params.getInt("seed") : -1,
       // String[] stop,
-      params.containsKey("stop") ? params.getStringArray("stop") : new String[0],
+      params.containsKey("stop") ? params.getStringArray("stop") : stops,
       // boolean ignore_eos,
       params.containsKey("ignore_eos") ? params.getBoolean("ignore_eos") : false,
       // double[][] logit_bias,
