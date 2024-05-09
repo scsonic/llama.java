@@ -3,8 +3,8 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context=".FullscreenActivity"
-  >
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  tools:context=".FullscreenActivity">
 
   <ImageView
     android:visibility="visible"
@@ -34,6 +34,41 @@
     android:layout_above="@id/llResponse"
     android:layout_alignParentRight="true">
   </Button>
+  <com.google.android.material.button.MaterialButtonToggleGroup
+    android:id="@+id/toggle_button_group"
+    android:gravity="center_horizontal"
+    app:singleSelection = "true"
+    app:selectionRequired="true"
+    android:orientation="horizontal"
+    android:padding="4dp"
+    app:checkedButton="@+id/button1"
+    android:layout_above="@id/llResponse"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.google.android.material.button.MaterialButton
+      style="?attr/materialButtonOutlinedStyle"
+      android:id="@+id/button1"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Button 1"
+      />
+    <com.google.android.material.button.MaterialButton
+      style="?attr/materialButtonOutlinedStyle"
+      android:id="@+id/button2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:text="Button 2"
+      />
+    <com.google.android.material.button.MaterialButton
+      style="?attr/materialButtonOutlinedStyle"
+      android:id="@+id/button3"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Button 3"
+      />
+
+  </com.google.android.material.button.MaterialButtonToggleGroup>
   <LinearLayout
     android:id="@+id/llResponse"
     android:layout_alignParentBottom="true"
