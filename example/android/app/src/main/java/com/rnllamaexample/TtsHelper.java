@@ -238,13 +238,21 @@ public class TtsHelper implements Runnable{
   }
 
 
-
-  public void UIShowLanguageSelection(Activity act){
+  public ArrayList<Locale> getLangList(){
     ArrayList<Locale> localeList = new ArrayList<>();
     localeList.add(Locale.US);
     localeList.add(Locale.FRANCE);
+    localeList.add(Locale.GERMAN);
+    localeList.add(Locale.JAPANESE);
+    localeList.add(Locale.KOREA);
+    localeList.add(Locale.CHINA);
     localeList.add(Locale.forLanguageTag("vi"));
-    localeList.add(Locale.CHINESE);
+
+    return localeList;
+  }
+
+  public void UIShowLanguageSelection(Activity act){
+    ArrayList<Locale> localeList = getLangList();
 
     ArrayList<String> itemList = new ArrayList<>();
 
