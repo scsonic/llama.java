@@ -36,6 +36,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hdb.avatar.ModelHelper;
 import com.hdb.avatar.AvatarPlayer;
@@ -193,6 +194,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
       itemList.add("Test Play Audio(Avatar)");
       itemList.add("Test Play Audio(MediaPlayer)");
+      itemList.add("Select TTS Language");
 
       // 创建AlertDialog.Builder
       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -224,6 +226,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           }
           else if (which == 4 ) {
             ttsHelper.playStoredWavFile(testWav);
+          }
+          else if (which == 5) {
+            ttsHelper.UIShowLanguageSelection(FullscreenActivity.this);
           }
         }
       });
@@ -589,7 +594,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   public void onFail(String message) {
     Log.e(TAG, "cb onFail:" + message) ;
     mHandler.post(()->{
-      //Toast.makeText(FullscreenActivity.this, message, Toast.LENGTH_SHORT).show();
+      Toast.makeText(FullscreenActivity.this, message, Toast.LENGTH_SHORT).show();
     });
   }
 

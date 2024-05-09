@@ -1,6 +1,9 @@
 package com.rnllamaexample;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioTrack;
@@ -10,6 +13,7 @@ import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.hdb.avatar.AvatarPlayer;
@@ -20,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,7 +33,7 @@ public class TtsHelper implements Runnable{
 
   static public String TAG = "TtsHelper";
 
-  private TextToSpeech textToSpeech;
+  public TextToSpeech textToSpeech;
   private Context context;
   String emptyPath = "" ;
 
@@ -230,5 +235,48 @@ public class TtsHelper implements Runnable{
       textToSpeech.shutdown();
     }
     running = false ;
+  }
+
+
+
+  public void UIShowLanguageSelection(Activity act){
+    ArrayList<Locale> localeList = new ArrayList<>();
+    localeList.add(Locale.US);
+    localeList.add(Locale.FRANCE);
+    localeList.add(Locale.forLanguageTag("vi"));
+    localeList.add(Locale.CHINESE);
+
+    ArrayList<String> itemList = new ArrayList<>();
+
+    for (Locale l: localeList){
+      itemList.add(l.getLanguage());
+    }
+
+    // 创建AlertDialog.Builder
+    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    builder.setTitle("Select TTS(Download first)");
+
+    // 设置列表适配器
+    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(act, android.R.layout.simple_list_item_1, itemList);
+    builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        Locale locale = localeList.get(which);
+        int result = textToSpeech.setLanguage(locale);
+        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+          Log.e("TtsHelper", "Language is not supported or missing data");
+          cb.onFail("TTS Fail: Not Support Lang");
+        }
+      }
+    });
+
+    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
   }
 }
