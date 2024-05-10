@@ -463,7 +463,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
              });
            }
          }.start();
-
+    setupTTSButton() ;
 
     receiver = new BroadcastReceiver() {
       @Override
@@ -483,8 +483,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
               tvResponse.scrollTo(0, 0);
           }
         }
-
-        setupTTSButton() ;
       }
     };
 
