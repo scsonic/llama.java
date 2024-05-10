@@ -257,7 +257,7 @@ public class TtsHelper implements Runnable{
     ArrayList<String> itemList = new ArrayList<>();
 
     for (Locale l: localeList){
-      itemList.add(l.getLanguage().toUpperCase());
+      itemList.add(l.getDisplayLanguage()) ;
     }
 
     // 创建AlertDialog.Builder

@@ -38,6 +38,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.hdb.avatar.ModelHelper;
 import com.hdb.avatar.AvatarPlayer;
 import com.hdb.avatar.EmotionType;
@@ -46,6 +48,7 @@ import com.hdb.avatar.IAvatarPlayerEvents;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -64,6 +67,13 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     EditText etInput ;
     ProgressBar pbLoading;
   ImageButton btnMore;
+
+  MaterialButtonToggleGroup mbtgLang;
+  MaterialButton btnLang0 ;
+  MaterialButton btnLang1 ;
+  MaterialButton btnLang2 ;
+  MaterialButton btnLang3 ;
+  MaterialButton btnLangMore ;
 
     BroadcastReceiver receiver ;
     TtsHelper ttsHelper;
@@ -183,6 +193,38 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     });
 
 
+  public void setupTTSButton(){
+
+    btnLang0 = findViewById(R.id.btnLang0);
+    btnLang1 = findViewById(R.id.btnLang1);
+    btnLang2 = findViewById(R.id.btnLang2);
+    btnLang3 = findViewById(R.id.btnLang3);
+    btnLangMore = findViewById(R.id.btnLangMore);
+
+
+    btnLang0.setOnClickListener((v)->{
+      ttsHelper.textToSpeech.setLanguage(Locale.ENGLISH);
+    });
+
+    btnLang1.setOnClickListener((v)->{
+      ttsHelper.textToSpeech.setLanguage(Locale.CHINESE);
+    });
+
+    btnLang2.setOnClickListener((v)->{
+      ttsHelper.textToSpeech.setLanguage(Locale.FRANCE);
+    });
+
+    btnLang3.setOnClickListener((v)->{
+      ttsHelper.textToSpeech.setLanguage(Locale.GERMANY);
+    });
+
+    btnLangMore.setOnClickListener((v)->{
+      ttsHelper.UIShowLanguageSelection(FullscreenActivity.this);
+    });
+
+  }
+
+
 
   private View.OnClickListener onMorePress = new View.OnClickListener() {
     @Override
@@ -249,6 +291,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     itemList.add("james.glb");
     itemList.add("james2.glb");
     itemList.add("engineer.glb");
+    itemList.add("david.glb");
+    itemList.add("david_formal.glb");
 
     // 创建AlertDialog.Builder
     AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -270,6 +314,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         }
         else if (which == 2 ){
           raw_id = R.raw.engineer;
+        }
+        else if (which == 3 ){
+          raw_id = R.raw.david;
+        }
+        else if (which == 4 ){
+          raw_id = R.raw.david_formal;
         }
         String path = ModelHelper.copyRawFileToCache(FullscreenActivity.this, raw_id, selectedItem);
         mAvatarPlayer.loadAvatar("file://" + path);
@@ -433,6 +483,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
               tvResponse.scrollTo(0, 0);
           }
         }
+
+        setupTTSButton() ;
       }
     };
 
