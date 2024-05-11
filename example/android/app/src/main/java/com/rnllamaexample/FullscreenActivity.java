@@ -59,6 +59,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
 
   boolean testToggle = false;
+  boolean isForceLanguage = true ;
     private final Handler mHandler = new Handler(Looper.myLooper());
     ImageButton btnSubmit ;
     ImageButton btnStop ;
@@ -293,6 +294,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     itemList.add("engineer.glb");
     itemList.add("david.glb");
     itemList.add("david_formal.glb");
+    itemList.add("mcdonald.glb");
 
     // 创建AlertDialog.Builder
     AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -321,6 +323,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         else if (which == 4 ){
           raw_id = R.raw.david_formal;
         }
+        else if (which == 5 ){
+          raw_id = R.raw.mcdonald;
+        }
         String path = ModelHelper.copyRawFileToCache(FullscreenActivity.this, raw_id, selectedItem);
         mAvatarPlayer.loadAvatar("file://" + path);
       }
@@ -343,12 +348,20 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     itemDrawableList.add(R.drawable.back2);
     itemDrawableList.add(R.drawable.back3);
     itemDrawableList.add(R.drawable.back4);
+    itemDrawableList.add(R.drawable.airport);
+    itemDrawableList.add(R.drawable.clinic);
+    itemDrawableList.add(R.drawable.mcdonald);
+    itemDrawableList.add(R.drawable.paris_airport);
 
     ArrayList<String> itemList = new ArrayList<>();
     itemList.add(getResources().getResourceName(R.drawable.back1));
     itemList.add(getResources().getResourceName(R.drawable.back2));
     itemList.add(getResources().getResourceName(R.drawable.back3));
     itemList.add(getResources().getResourceName(R.drawable.back4));
+    itemList.add(getResources().getResourceName(R.drawable.airport));
+    itemList.add(getResources().getResourceName(R.drawable.clinic));
+    itemList.add(getResources().getResourceName(R.drawable.mcdonald));
+    itemList.add(getResources().getResourceName(R.drawable.paris_airport));
 
     // 创建AlertDialog.Builder
     AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -602,12 +615,17 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
     protected Void doInBackground(String... lines) {
 
+
+      String question = lines[0] ;
+      if (isForceLanguage){
+        question += " Please answer in " + ttsHelper.textToSpeech.getLanguage().getDisplayName();
+      }
       if (RagApi.RagEnable){
         Log.e(TAG, "Combine result=" + Arrays.toString(lines));
-        ret = LlamaHelper.shared.talk(lines[0], lines[1]);
+        ret = LlamaHelper.shared.talk(question, lines[1]);
       }
       else {
-        ret = LlamaHelper.shared.talk(lines[0]);
+        ret = LlamaHelper.shared.talk(question);
       }
       return null;
     }

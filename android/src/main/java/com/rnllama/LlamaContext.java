@@ -52,7 +52,7 @@ public class LlamaContext {
       // boolean embedding,
       params.containsKey("embedding") ? params.getBoolean("embedding") : false,
       // int n_ctx,
-      params.containsKey("n_ctx") ? params.getInt("n_ctx") : 2048,
+      params.containsKey("n_ctx") ? params.getInt("n_ctx") : 4096,
       // int n_batch,
       params.containsKey("n_batch") ? params.getInt("n_batch") : 256,
       // int n_threads,
