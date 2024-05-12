@@ -14,12 +14,15 @@ import com.rnllama.LlamaContext;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class LlamaHelper {
   static public String TAG = "LlamaHelper";
   static public LlamaHelper shared;
 
   static public String model_file_name = "" ;
+
+  ArrayList<LlamaRecord> talkHistory = new ArrayList<>();
 
   LlamaContext lctx ;
   static public void init(Context c) {
@@ -104,6 +107,41 @@ public class LlamaHelper {
     return true ;
   }
 
+  public boolean talkContinue(String line){
+    if (lctx.isPredicting()){
+      Log.e(TAG, "is isPredicting, cancel");
+      return false;
+    }
+    Bundle data = new Bundle() ; // Arguments.createMap();
+    LlamaRecord rec = new LlamaRecord(LlamaRecord.USER, line);
+
+    if (talkHistory.size() == 0 || !talkHistory.get(0).role.equalsIgnoreCase(LlamaRecord.SYSTEM)){
+      talkHistory.add(0, new LlamaRecord(LlamaRecord.SYSTEM, "You are an assistance at a DIY store, please help the customers at the best with your knowledge"));
+    }
+    talkHistory.add(rec) ;
+    String prompt = "" ;
+    if (model_file_name.contains("Phi")){
+      prompt = LlamaRecord.toPromptPHI3(talkHistory);
+      prompt += "<|" + LlamaRecord.ASSISTANT.toLowerCase() + "|>" ;
+      Log.e(TAG, "toPromptPHI3=" + prompt);
+    }
+    else {
+      // zephyr
+    }
+
+
+    Log.e(TAG, "talk:" + prompt);
+    data.putString(toUtf8("prompt"), toUtf8(prompt));
+    lctx.completion(data);
+
+    return true ;
+  }
+
+  public boolean cleanTalk(){
+    talkHistory.clear();
+    return true ;
+  }
+
 
   public boolean talk(String line, String rag){
     if (lctx.isPredicting()){
@@ -124,11 +162,17 @@ public class LlamaHelper {
     Log.e(TAG, "talk:" + template);
     data.putString(toUtf8("prompt"), toUtf8(template));
 
-
     //ReadableArray stopString = Arguments.fromArray(new String[]{"</s>"});
     //data.putArray("stop", stopString);
-    lctx.completion(data);
+    Bundle bundle = lctx.completion(data);
+    Log.e("@@", "Will not catch this, Bundle = " + bundle) ;
 
+    if (bundle != null) {
+      for (String key : bundle.keySet()) {
+        Object value = bundle.get(key);
+        Log.e("@@", key + " : " + value.toString());
+      }
+    }
     return true ;
   }
 

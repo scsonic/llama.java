@@ -82,7 +82,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
     private AvatarPlayer mAvatarPlayer;
     boolean isAutoScroll = true ;
-    String bufferMessage = "" ;
+    String bufferMessage = "" ; // for buffered to TTS
+    String responseMessage = "" ; // for catch all response to
     Button btnRag ;
 
     boolean isProcessing = false ;
@@ -484,6 +485,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
         if (intent.hasExtra("token")) {
           String text = intent.getStringExtra("token");
           bufferMessage += text ;
+          responseMessage += text ;
+
           mHandler.post(()->{
             processSplit();
           });
@@ -618,14 +621,20 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
       String question = lines[0] ;
       if (isForceLanguage){
-        question += " Please answer in " + ttsHelper.textToSpeech.getLanguage().getDisplayName();
+        try {
+          question += ", Please answer in " + ttsHelper.textToSpeech.getLanguage().getDisplayName();
+        }
+        catch ( Exception ex){
+          Log.e(TAG, "Can't get cur lang") ;
+        }
       }
       if (RagApi.RagEnable){
         Log.e(TAG, "Combine result=" + Arrays.toString(lines));
         ret = LlamaHelper.shared.talk(question, lines[1]);
       }
       else {
-        ret = LlamaHelper.shared.talk(question);
+        //ret = LlamaHelper.shared.talk(question);
+        ret = LlamaHelper.shared.talkContinue(question);
       }
       return null;
     }
@@ -643,6 +652,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       // talk the last
       processTTSAsync(bufferMessage);
       bufferMessage = "" ;
+      LlamaHelper.shared.talkHistory.add(new LlamaRecord(LlamaRecord.ASSISTANT, responseMessage));
+      responseMessage = "";
     }
   }
 
