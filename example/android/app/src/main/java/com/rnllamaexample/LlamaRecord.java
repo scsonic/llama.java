@@ -7,6 +7,7 @@ public class LlamaRecord {
   static public String USER = "user" ;
   static public String SYSTEM = "system" ;
   static public String ASSISTANT = "assistant" ;
+
   String role = "" ;
   String content = "" ;
 

@@ -1,14 +1,21 @@
 package com.rnllamaexample;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Toast;
 
 //import com.facebook.react.bridge.Arguments;
 //import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.hdb.avatar.EmotionType;
+import com.hdb.avatar.ModelHelper;
 import com.rnllama.LlamaContext;
 //import com.rnllama.LlamaContext;
 
@@ -22,6 +29,18 @@ public class LlamaHelper {
 
   static public String model_file_name = "" ;
 
+  static public String prePrompt = null ;
+  static public String KEY_LAST_PROMPT = "KEY_LAST_PROMPT";
+
+  static public String getPrePrompt(){
+    if (prePrompt == null){
+      prePrompt = Common.readSharePerf(KEY_LAST_PROMPT);
+    }
+    if (prePrompt == null){
+      prePrompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
+    }
+    return prePrompt ;
+  }
   ArrayList<LlamaRecord> talkHistory = new ArrayList<>();
 
   LlamaContext lctx ;
@@ -84,7 +103,7 @@ public class LlamaHelper {
     Bundle data = new Bundle() ; // Arguments.createMap();
     line += "";
 
-    String preprompt = "You are an assistance at a DIY store, please help the customers at the best with your knowledge" ;
+    String preprompt = getPrePrompt() ;
 
     String template = "<|user|>" + preprompt + "\n" +
       "</s>\n" +
@@ -116,7 +135,7 @@ public class LlamaHelper {
     LlamaRecord rec = new LlamaRecord(LlamaRecord.USER, line);
 
     if (talkHistory.size() == 0 || !talkHistory.get(0).role.equalsIgnoreCase(LlamaRecord.SYSTEM)){
-      talkHistory.add(0, new LlamaRecord(LlamaRecord.SYSTEM, "You are an assistance at a DIY store, please help the customers at the best with your knowledge"));
+      talkHistory.add(0, new LlamaRecord(LlamaRecord.SYSTEM, getPrePrompt()));
     }
     talkHistory.add(rec) ;
     String prompt = "" ;
@@ -179,4 +198,70 @@ public class LlamaHelper {
     return true ;
   }
 
+
+  static public void UIShowPrePromptSelection(Activity act){
+
+
+    ArrayList<String> promptList = new ArrayList<>();
+    promptList.add("Fill new one");
+    promptList.add("You are an assistance at a DIY store, please help the customers at the best with your knowledge");
+    promptList.add("you are a cashier in McDonald's, you will continue to serve until he places his order, you can make recommendations while he is making his order. ");
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    builder.setTitle("Select Prompt(keep in app storage)");
+
+    // 设置列表适配器
+    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(act, android.R.layout.simple_list_item_1, promptList);
+    builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        // 处理选项点击事件
+        String newPrompt = promptList.get(which);
+        if (which == 0 ){
+          // show edittext
+          UIShowPrePromptInput(act);
+        }
+        else{
+          prePrompt = newPrompt;
+          Common.writeSharePerf(KEY_LAST_PROMPT, prePrompt);
+        }
+      }
+    });
+
+    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
+  };
+
+  static public void UIShowPrePromptInput(Activity act){
+    AlertDialog.Builder builder = new AlertDialog.Builder(act);
+    builder.setTitle("Enter new PrePrompt");
+
+    final EditText editText = new EditText(act);
+    editText.setText(getPrePrompt());
+    builder.setView(editText);
+    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        // 当用户点击“OK”按钮时的处理逻辑
+        String inputText = editText.getText().toString();
+        prePrompt = inputText;
+      }
+    });
+
+    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        dialog.cancel();
+      }
+    });
+
+    AlertDialog dialog = builder.create();
+    dialog.show();
+  }
 }

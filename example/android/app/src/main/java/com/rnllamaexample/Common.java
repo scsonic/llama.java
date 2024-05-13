@@ -2,6 +2,7 @@ package com.rnllamaexample;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -15,6 +16,35 @@ public class Common {
       });
 
     }
-
   }
+  static public boolean writeSharePerf(String tag, String data)
+  {
+    try {
+      SharedPreferences pref = act.getSharedPreferences(tag, Context.MODE_PRIVATE);
+      SharedPreferences.Editor editor = pref.edit() ;
+      editor.putString(tag, data ) ;
+      editor.commit() ;
+      editor.apply() ;
+      return true;
+    }
+    catch (Exception ex)
+    {
+      return false ;
+    }
+  }
+
+  /**
+   * 備份root路徑
+   */
+  static public String readSharePerf(String tag)
+  {
+    SharedPreferences pref = act.getSharedPreferences(tag, Context.MODE_PRIVATE);
+    String data = pref.getString(tag, "") ;
+
+    if ( data.equalsIgnoreCase(""))
+      return null ;
+    else
+      return data ;
+  }
+
 }

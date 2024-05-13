@@ -232,6 +232,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       itemList.add("Test Play Audio(Avatar)");
       itemList.add("Test Play Audio(MediaPlayer)");
       itemList.add("Select TTS Language");
+      itemList.add("Select Pre Prompt");
+
 
       // 创建AlertDialog.Builder
       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -265,6 +267,9 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           }
           else if (which == 5) {
             ttsHelper.UIShowLanguageSelection(FullscreenActivity.this);
+          }
+          else if (which == 6){
+            LlamaHelper.UIShowPrePromptSelection(FullscreenActivity.this);
           }
         }
       });
