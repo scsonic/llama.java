@@ -35,5 +35,22 @@ public class LlamaRecord {
     }
     return prompt ;
   }
+
+  public static String toPromptChatML(ArrayList<LlamaRecord> recordList) {
+    String prompt = "" ;
+    String end = "</s>\n" ;
+    for (LlamaRecord record: recordList){
+      if (record.role.equalsIgnoreCase(USER) || record.role.equalsIgnoreCase(SYSTEM)){
+        prompt += "<|user|>\n" + record.content + end ;
+      }
+      else if (record.role.equalsIgnoreCase(ASSISTANT)){
+        prompt += "<|assistant|>\n" + record.content + end ;
+      }
+      else {
+        prompt += "<|error:" + record.role + "|>\n" + record.content + end ;
+      }
+    }
+    return prompt ;
+  }
 }
 

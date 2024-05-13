@@ -85,18 +85,11 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     String bufferMessage = "" ; // for buffered to TTS
     String responseMessage = "" ; // for catch all response to
     Button btnRag ;
+    Button btnChatControl ;
+    Button btnNewSession;
 
     boolean isProcessing = false ;
 
-
-    public void toggleRag(){
-      if (RagApi.RagEnable){
-        btnRag.setVisibility(View.VISIBLE);
-      }
-      else {
-        btnRag.setVisibility(View.GONE);
-      }
-    }
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -261,7 +254,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
           }
           else if (which == 2 ){
             RagApi.RagEnable = !RagApi.RagEnable;
-            toggleRag();
 //            Intent i = new Intent(FullscreenActivity.this, ShellActivity.class);
 //            startActivity(i);
           }
@@ -296,6 +288,56 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     itemList.add("david.glb");
     itemList.add("david_formal.glb");
     itemList.add("mcdonald.glb");
+
+    // 创建AlertDialog.Builder
+    AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+    builder.setTitle("Select Model");
+
+    // 设置列表适配器
+    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(FullscreenActivity.this, android.R.layout.simple_list_item_1, itemList);
+    builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        // 处理选项点击事件
+        String selectedItem = itemList.get(which);
+        int raw_id = 0;
+        if (which == 0 ){
+          raw_id = R.raw.james;
+        }
+        else if (which == 1 ){
+          raw_id = R.raw.james2;
+        }
+        else if (which == 2 ){
+          raw_id = R.raw.engineer;
+        }
+        else if (which == 3 ){
+          raw_id = R.raw.david;
+        }
+        else if (which == 4 ){
+          raw_id = R.raw.david_formal;
+        }
+        else if (which == 5 ){
+          raw_id = R.raw.mcdonald;
+        }
+        String path = ModelHelper.copyRawFileToCache(FullscreenActivity.this, raw_id, selectedItem);
+        mAvatarPlayer.loadAvatar("file://" + path);
+      }
+    });
+
+    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+      }
+    });
+
+    AlertDialog alertDialog = builder.create();
+    alertDialog.show();
+  }
+
+
+  public void UIShowChatControl(){
+    ArrayList<String> itemList = new ArrayList<>();
+    itemList.add("Chat History");
 
     // 创建AlertDialog.Builder
     AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
@@ -450,17 +492,35 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
       btnSubmit.setEnabled(false);
 
-      btnRag = findViewById(R.id.btnRag) ;
-      btnRag.setOnClickListener((v)->{
-        AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
-        builder.setTitle("RAG Prompt");
-        builder.setMessage(lastRagContent) ;
+      btnNewSession = findViewById(R.id.btnNewSession);
+    btnNewSession.setOnClickListener((v)->{
+      LlamaHelper.shared.cleanTalk();
+      tvResponse.setText("");
+    });
+
+    btnChatControl = findViewById(R.id.btnChatControl);
+    btnChatControl.setOnClickListener((v)->{
+      //display chat message
+      String history = LlamaRecord.toPromptPHI3(LlamaHelper.shared.talkHistory);
+       AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+        builder.setTitle("History");
+        builder.setMessage(history) ;
         builder.setPositiveButton("OK", (d, i)->{
           d.dismiss();
         });
         builder.create().show();
-      });
-      toggleRag();
+    });
+
+//      btnRag = findViewById(R.id.btnRag) ;
+//      btnRag.setOnClickListener((v)->{
+//        AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
+//        builder.setTitle("RAG Prompt");
+//        builder.setMessage(lastRagContent) ;
+//        builder.setPositiveButton("OK", (d, i)->{
+//          d.dismiss();
+//        });
+//        builder.create().show();
+//      });
 
       btnMore.setOnClickListener( onMorePress );
 
@@ -635,6 +695,12 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
       else {
         //ret = LlamaHelper.shared.talk(question);
         ret = LlamaHelper.shared.talkContinue(question);
+      }
+
+      try {
+        Thread.sleep(200) ;
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
       return null;
     }

@@ -127,6 +127,9 @@ public class LlamaHelper {
     }
     else {
       // zephyr
+      prompt = LlamaRecord.toPromptChatML(talkHistory);
+      prompt += "<|" + LlamaRecord.ASSISTANT.toLowerCase() + "|>" ;
+      Log.e(TAG, "toPromptChatML=" + prompt);
     }
 
 
