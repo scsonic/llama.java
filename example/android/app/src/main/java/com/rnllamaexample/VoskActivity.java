@@ -78,15 +78,28 @@ public class VoskActivity extends Activity implements
   }
   private void initModel() {
 
-
-    AssetManager assetManager = this.getAssets();
-    File externalFilesDir = this.getExternalFilesDir(null);
-
     String sourcePath = "model-en-us";
-    String targetPath = "" ;
-    File targetDir = new File(externalFilesDir, targetPath);
-    String resultPath = new File(targetDir, sourcePath).getAbsolutePath();
+    String targetPath = "test" ;
+
     try {
+      AssetManager assetManager = this.getAssets();
+      String[] filelist = assetManager.list("");
+      for (String f : filelist){
+        Log.e(TAG, "asset file=" + f) ;
+      }
+      File mdir = new File("model-en") ;
+      for (String f : mdir.list()){
+        Log.e(TAG, "model file=" + f) ;
+      }
+      File externalFilesDir = this.getExternalFilesDir(null);
+
+      Log.e(TAG, "Ext files(for output)");
+      for (String f : externalFilesDir.list()){
+        Log.e(TAG, "external file=" + f) ;
+      }
+
+      File targetDir = new File(externalFilesDir, targetPath);
+      String resultPath = new File(targetDir, sourcePath).getAbsolutePath();
       String sourceUUID = readLine(assetManager.open(sourcePath + "/uuid"));
       Log.e(TAG, "UUID=" + sourceUUID);
     }catch (Exception ex){
@@ -101,10 +114,6 @@ public class VoskActivity extends Activity implements
       (exception) -> {
       setErrorState("Failed to unpack the model" + exception.getMessage());
       Log.e("@@", exception.getMessage(), exception);
-      for (StackTraceElement st: exception.getStackTrace()){
-        Log.e("@@_", st.toString());
-        Log.e("@@_", st.getMethodName());
-      }
       });
   }
 
