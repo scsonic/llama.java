@@ -7,7 +7,10 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -48,6 +51,15 @@ public class VoskActivity extends Activity implements RecognitionListener {
   private SpeechStreamService speechStreamService;
   private TextView resultView;
 
+  Spinner spInput ;
+  Spinner spOutput ;
+
+
+  String audioText = "" ;
+  String audioBuffer = "" ;
+
+  String llmText = "" ;
+
   @Override
   public void onCreate(Bundle state) {
     super.onCreate(state);
@@ -57,9 +69,42 @@ public class VoskActivity extends Activity implements RecognitionListener {
     resultView = findViewById(R.id.result_text);
     setUiState(STATE_START);
 
-    findViewById(R.id.recognize_mic).setOnClickListener(view -> recognizeMicrophone());
+    findViewById(R.id.recognize_mic).setOnClickListener((v) -> {
+      audioBuffer = "" ;
+      audioText = "" ;
+      llmText = "" ;
+      updateResult();
+      recognizeMicrophone();
+
+      });
     ((ToggleButton) findViewById(R.id.pause)).setOnCheckedChangeListener((view, isChecked) -> pause(isChecked));
 
+
+    spInput = findViewById(R.id.spInput);
+    spInput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        Log.e(TAG, "Change to lang:" + spInput.getSelectedItem().toString()) ;
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+
+      }
+    });
+
+    spOutput = findViewById(R.id.spOutput);
+    spOutput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        Log.e(TAG, "Convert to lang:" + spInput.getSelectedItem().toString()) ;
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> adapterView) {
+
+      }
+    });
     LibVosk.setLogLevel(LogLevel.INFO);
 
     // Check if user has given permission to record audio, init the model after permission is granted
@@ -76,25 +121,12 @@ public class VoskActivity extends Activity implements RecognitionListener {
   }
   private void initModel() {
 
-    String sourcePath = "model-en";
+    String sourcePath = "model-cn";
     String targetPath = "test" ;
 
     try {
       AssetManager assetManager = this.getAssets();
-      String[] filelist = assetManager.list("");
-      for (String f : filelist){
-        Log.e(TAG, "asset file=" + f) ;
-      }
-      File mdir = new File("model-en") ;
-      for (String f : mdir.list()){
-        Log.e(TAG, "model file=" + f) ;
-      }
       File externalFilesDir = this.getExternalFilesDir(null);
-
-      Log.e(TAG, "Ext files(for output)");
-      for (String f : externalFilesDir.list()){
-        Log.e(TAG, "external file=" + f) ;
-      }
 
       File targetDir = new File(externalFilesDir, targetPath);
       String resultPath = new File(targetDir, sourcePath).getAbsolutePath();
@@ -146,14 +178,24 @@ public class VoskActivity extends Activity implements RecognitionListener {
     }
   }
 
+
+  public void updateResult() {
+    resultView.setText(audioText + audioBuffer) ;
+  }
   @Override
   public void onResult(String hypothesis) {
-    resultView.append(hypothesis + "\n");
+    Log.e(TAG, "onResult=" + hypothesis);
+    String text = Common.getResult(hypothesis);
+    audioText += text;
+    audioBuffer = "" ;
+    updateResult() ;
   }
 
   @Override
   public void onFinalResult(String hypothesis) {
-    resultView.append(hypothesis + "\n");
+    Log.e(TAG, "onFinalResult=" + hypothesis);
+    onResult(hypothesis);
+
     setUiState(STATE_DONE);
     if (speechStreamService != null) {
       speechStreamService = null;
@@ -162,7 +204,12 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
   @Override
   public void onPartialResult(String hypothesis) {
-    resultView.append(hypothesis + "\n");
+    Log.e(TAG, "onPartialResult=" + hypothesis);
+
+    String part = Common.getResult(hypothesis);
+    //resultView.append(hypothesis + "\n");
+    audioBuffer = part ;
+    updateResult();
   }
 
   @Override

@@ -74,6 +74,13 @@
     android:textOn="CONTINUE"/>
 
   <TextView
+    android:text="Voice Input:"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+  </TextView>
+
+  <TextView
     android:id="@+id/result_text"
     android:layout_weight="0.4"
     android:layout_width="match_parent"
@@ -82,6 +89,12 @@
     android:scrollbars="vertical"
     android:textAppearance="?android:attr/textAppearanceMedium" />
 
+  <TextView
+    android:text="Translate Output:"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+  </TextView>
   <TextView
     android:id="@+id/tvTranslate"
     android:layout_weight="0.4"

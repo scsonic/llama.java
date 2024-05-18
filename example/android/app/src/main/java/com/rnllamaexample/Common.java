@@ -7,6 +7,9 @@ import android.widget.Toast;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Common {
   static public Activity act ;
   static public void Toast(String message){
@@ -45,6 +48,21 @@ public class Common {
       return null ;
     else
       return data ;
+  }
+
+  static public String getResult(String json){
+    try {
+      JSONObject obj = new JSONObject(json);
+      if (obj.has("text")){
+        return obj.getString("text") ;
+      }
+      if (obj.has("partial")){
+        return obj.getString("partial");
+      }
+    } catch (JSONException e) {
+      throw new RuntimeException(e);
+    }
+    return "";
   }
 
 }
