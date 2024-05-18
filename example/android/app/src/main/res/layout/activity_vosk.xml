@@ -102,7 +102,7 @@
     android:layout_height="match_parent"
     android:gravity="bottom"
     android:scrollbars="vertical"
-    android:text="AAA\nBB\nCCC\nDDDDDFJFKJA:LJF:DJF\nDDD"
+    android:text=""
     android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>

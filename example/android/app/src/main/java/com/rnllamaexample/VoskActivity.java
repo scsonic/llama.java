@@ -2,9 +2,15 @@ package com.rnllamaexample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -36,6 +43,7 @@ import androidx.core.content.ContextCompat;
 public class VoskActivity extends Activity implements RecognitionListener {
 
   static public String TAG = "VoskView";
+  BroadcastReceiver receiver ;
 
   static private final int STATE_START = 0;
   static private final int STATE_READY = 1;
@@ -53,16 +61,21 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
   Spinner spInput ;
   Spinner spOutput ;
+  Handler mHandler = new Handler() ;
 
 
   String audioText = "" ;
   String audioBuffer = "" ;
 
-  String llmText = "" ;
+  String llmBuffer = "" ;
+  TextView tvTranslate  ;
+  TranslateTask translateTask = null ;
 
   @Override
   public void onCreate(Bundle state) {
     super.onCreate(state);
+    Common.act = this ;
+    LlamaHelper.prePrompt = "Please Translate into English, do not response anything else." ;
     setContentView(R.layout.activity_vosk);
 
     // Setup layout
@@ -72,7 +85,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
     findViewById(R.id.recognize_mic).setOnClickListener((v) -> {
       audioBuffer = "" ;
       audioText = "" ;
-      llmText = "" ;
+      llmBuffer = "" ;
       updateResult();
       recognizeMicrophone();
 
@@ -92,6 +105,8 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
       }
     });
+
+    tvTranslate = findViewById(R.id.tvTranslate) ;
 
     spOutput = findViewById(R.id.spOutput);
     spOutput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -114,6 +129,39 @@ public class VoskActivity extends Activity implements RecognitionListener {
     } else {
       initModel();
     }
+
+    new Thread(){
+      @Override
+      public void run() {
+        super.run();
+        if (LlamaHelper.shared == null ) {
+          LlamaHelper.init(VoskActivity.this);
+          Log.e(TAG, "Module Init Success");
+        }
+      }
+    }.start();
+
+
+    receiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        if (intent.hasExtra("token")) {
+          String text = intent.getStringExtra("token");
+          tvTranslate.append(text) ;
+
+//          if ( isAutoScroll) {
+//            final int scrollAmount = tvResponse.getLayout().getLineTop(tvResponse.getLineCount()) - tvResponse.getHeight();
+//            if (scrollAmount > 0)
+//              tvResponse.scrollTo(0, scrollAmount + 50);
+//            else
+//              tvResponse.scrollTo(0, 0);
+//          }
+        }
+      }
+    };
+
+    IntentFilter reg = new IntentFilter("com.rnllama.send");
+    registerReceiver(receiver, reg);
   }
 
   private static String readLine(InputStream is) throws IOException {
@@ -187,8 +235,16 @@ public class VoskActivity extends Activity implements RecognitionListener {
     Log.e(TAG, "onResult=" + hypothesis);
     String text = Common.getResult(hypothesis);
     audioText += text;
+    llmBuffer += text ;
     audioBuffer = "" ;
     updateResult() ;
+
+    if (translateTask == null && llmBuffer.length() > 3){
+      translateTask = new TranslateTask();
+      String copy = llmBuffer + "" ;
+      llmBuffer = "" ;
+      translateTask.execute(copy);
+    }
   }
 
   @Override
@@ -288,4 +344,39 @@ public class VoskActivity extends Activity implements RecognitionListener {
     }
   }
 
+
+
+  class TranslateTask extends AsyncTask<String, Void, Void> {
+
+    boolean ret = false ;
+    @Override
+    protected void onPreExecute() {
+      super.onPreExecute();
+      Log.e(TAG, "TranslateTask on pre execute");
+    }
+
+    protected Void doInBackground(String... lines) {
+
+
+      String inputText = lines[0] ;
+
+
+      ret = LlamaHelper.shared.talk(inputText);
+
+      try {
+        Thread.sleep(100) ;
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void unused) {
+      super.onPostExecute(unused);
+      Log.e(TAG, "Task End, FREE");
+      // wait for call next
+      translateTask = null ;
+    }
+  }
 }

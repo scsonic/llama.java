@@ -569,7 +569,6 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 
     IntentFilter reg = new IntentFilter("com.rnllama.send");
        registerReceiver(receiver, reg);
-
     }
 
   private void test() {
