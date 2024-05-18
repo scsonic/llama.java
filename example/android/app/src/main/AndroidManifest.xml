@@ -22,9 +22,23 @@
   android:usesCleartextTraffic="true"
   android:roundIcon="@mipmap/ic_launcher_round"
   android:theme="@style/AppTheme">
+
+  <activity
+    android:name=".VoskActivity"
+    android:label="EdgeTranslation"
+    android:launchMode="singleTask"
+    android:exported="true" >
+    <intent-filter>
+      <action android:name="android.intent.action.MAIN" />
+
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+  </activity>
+  
   <activity
     android:name=".ShellActivity"
     android:exported="false" />
+
   <activity
     android:name=".FullscreenActivity"
     android:configChanges="orientation|keyboardHidden|screenSize"
@@ -59,17 +73,6 @@
     android:windowSoftInputMode="adjustResize">
   </activity>
 
-  <activity
-    android:name=".VoskActivity"
-    android:label="EdgeTranslation"
-    android:launchMode="singleTask"
-    android:exported="true" >
-    <intent-filter>
-      <action android:name="android.intent.action.MAIN" />
-
-      <category android:name="android.intent.category.LAUNCHER" />
-    </intent-filter>
-  </activity>
 </application>
 
 </manifest>

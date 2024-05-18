@@ -9,8 +9,8 @@
 
 
   <string name="recognize_file">Recognize File</string>
-  <string name="recognize_microphone">Recognize Microphone</string>
-  <string name="stop_microphone">Stop Microphone</string>
+  <string name="recognize_microphone">Start</string>
+  <string name="stop_microphone">Stop</string>
   <string name="preparing">Preparing the recognizer\n</string>
   <string name="ready">Ready\n</string>
   <string name="failed">Failed to init recognizer %s\n</string>
@@ -19,4 +19,19 @@
   <string name="stop_file">Stop File</string>
   <string name="pause">Pause</string>
   <string name="continueRecognition">Continue</string>
+
+  <string-array name="InputLang">
+    <item>EN</item>
+    <item>FR</item>
+    <item>CH</item>
+  </string-array>
+
+  <string-array name="OutputLang">
+    <item>EN</item>
+    <item>FR</item>
+    <item>GE</item>
+    <item>VI</item>
+    <item>CH</item>
+    <item>JP</item>
+  </string-array>
 </resources>
