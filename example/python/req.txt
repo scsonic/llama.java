@@ -1,0 +1,20 @@
+
+pip install langchain faiss-cpu flask sentence-transformers
+
+http://172.20.10.3:10080/query?query=record%20video
+curl "http://127.0.0.1:10080/query?query=record%20video"
+
+curl "http://172.20.10.3:10080/query?query=shit video"
+
+curl -X POST -d "This is the entire request body" "http://127.0.0.1:10080/upload"
+curl -X POST -H "Content-Type: text/plain" -d "This is the entire request body" "http://127.0.0.1:10080/upload"
+
+
+"Use the following pieces of context to answer the question at the end.
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+\n\n
+
+Click this button 3 times within 2 seconds to trigger a factory reset.\n\nGetting Started\nThe UNOlite is a building-grade air quality monitor that can measure the ambient temperature / humidity / CO2 / PM1 / PM2.5 / PM10 / TVOC and provide multiple protocols for wired or wireless networks. Further information can be found on the UNOlite Resource at: https://isdweb.deltaww.com/resources/enter\n\nPower and Connectivity\nThe UNOlite provides multiple power and connectivity options: Power:\n Adapter: Only use the cable and charger/adapter supplied with the device\n AC/DC direct wiring: Used for power supplies of 12-24V DC or 24V AC\n\nIn factory reset operation:\nStandard operation\nDescription\nAll LED\nFlash rapidly\nDevice is performing a factory reset\n\nKey\nDescription\nHardware reset\nPress this button to trigger a power-cut reboot.\n\nInstallation\nThe UNOlite can be mounted on a concrete block wall, drywall, ceiling, or to an electrical box. For detailed instructions on the installation, power, and connectivity setup, please visit our support center website at https://isdweb.deltaww.com/resources/ or scan the QR code below.\n\nWarranty Information\nDelta provides a 1-year limited manufacturer warranty on the UNOlite. To obtain a copy of the warranty for this product, please visit\nhttps://isdweb.deltaww.com/resources/warranty.html or scan the QR code below.\n\n5\n\nQuestion: how can i reset unolite\n
+
+
+Helpful Answer:"  ]}

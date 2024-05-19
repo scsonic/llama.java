@@ -98,8 +98,8 @@ android {
         applicationId "com.rnllamaexample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "1.12"
     }
 
     splits {
@@ -149,10 +149,17 @@ android {
 }
 
 dependencies {
+  implementation 'net.java.dev.jna:jna:5.13.0@aar'
+  implementation 'com.alphacephei:vosk-android:0.3.47@aar'
+
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.4.0'
+  implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
@@ -167,4 +174,17 @@ dependencies {
     }
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle")
+apply plugin: 'org.jetbrains.kotlin.android'; applyNativeModulesAppBuildGradle(project)
+
+tasks.register('genUUID') {
+  def uuid = UUID.randomUUID().toString()
+  def odir = file("$buildDir/generated/assets/model-en-us")
+  def ofile = file("$odir/uuid")
+  doLast {
+    mkdir odir
+    ofile.text = uuid
+  }
+}
+
+preBuild.dependsOn(genUUID)
