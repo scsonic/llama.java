@@ -24,14 +24,14 @@ public class LlamaRecord {
       if (record.role.equalsIgnoreCase(USER)){
         prompt += "<|user|>\n" + record.content + end ;
       }
-      else if (record.role.equalsIgnoreCase(SYSTEM)){
+      else if (record.role.equalsIgnoreCase(SYSTEM) && record.content.length() > 0){
         prompt += "<|system|>\n" + record.content + end ;
       }
       else if (record.role.equalsIgnoreCase(ASSISTANT)){
         prompt += "<|assistant|>\n" + record.content + end ;
       }
       else {
-        prompt += "<|error:" + record.role + "|>\n" + record.content + end ;
+        //prompt += "<|error:" + record.role + "|>\n" + record.content + end ;
       }
     }
     return prompt ;

@@ -77,7 +77,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
     Common.act = this ;
 
 
-    LlamaHelper.prePrompt = "your are acting like a speed translator, only translate the input text, and only output translation text with requested language, nothing else";
+    LlamaHelper.prePrompt = "";
     setContentView(R.layout.activity_vosk);
 
     // Setup layout
@@ -362,8 +362,11 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
       String inputText = lines[0] ;
 
+      String prefixPrompt = "Translate into English, do not respond with extra words:" ;
 
-      ret = LlamaHelper.shared.talk(inputText);
+      LlamaHelper.shared.cleanTalk();
+      ret = LlamaHelper.shared.talkContinue(prefixPrompt + inputText);
+
 
       try {
         Thread.sleep(100) ;
