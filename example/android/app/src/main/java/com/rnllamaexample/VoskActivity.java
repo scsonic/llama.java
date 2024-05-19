@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -68,11 +69,14 @@ public class VoskActivity extends Activity implements RecognitionListener {
   String audioText = "" ;
   String audioBuffer = "" ;
   ArrayList<String> audioTextList = new ArrayList<>();
-  ArrayList<String> llmTextList = new ArrayList<>() ;
 
   String llmBuffer = "" ;
   TextView tvTranslate  ;
   TranslateTask translateTask = null ;
+  TextView tvAudioBuffer ;
+  ListView lvListView ;
+  ItemAdapter adapter ;
+  ArrayList<Item> llmTextList = new ArrayList<>();
 
   @Override
   public void onCreate(Bundle state) {
@@ -82,6 +86,9 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
     LlamaHelper.prePrompt = "";
     setContentView(R.layout.activity_vosk);
+
+    lvListView = findViewById(R.id.lvListView);
+    tvAudioBuffer = findViewById(R.id.tvAudioBuffer) ;
 
     // Setup layout
     resultView = findViewById(R.id.result_text);
@@ -159,6 +166,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
         if (intent.hasExtra("token")) {
           String text = intent.getStringExtra("token");
           tvTranslate.append(text) ;
+          llmBuffer += text ;
 
 //          if ( isAutoScroll) {
 //            final int scrollAmount = tvResponse.getLayout().getLineTop(tvResponse.getLineCount()) - tvResponse.getHeight();
@@ -173,6 +181,9 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
     IntentFilter reg = new IntentFilter("com.rnllama.send");
     registerReceiver(receiver, reg);
+
+    adapter = new ItemAdapter(this, llmTextList);
+    lvListView.setAdapter(adapter);
   }
 
   private static String readLine(InputStream is) throws IOException {
@@ -245,7 +256,6 @@ public class VoskActivity extends Activity implements RecognitionListener {
     Log.e(TAG, "onResult=" + hypothesis);
     String text = Common.getResult(hypothesis);
     audioText += text;
-    llmBuffer += text ;
 
     if ( text.length() > 0 ) {
       audioTextList.add(text);
@@ -291,8 +301,10 @@ public class VoskActivity extends Activity implements RecognitionListener {
   public void onPartialResult(String hypothesis) {
     //Log.e(TAG, "onPartialResult=" + hypothesis);
 
+
     String part = Common.getResult(hypothesis);
     //resultView.append(hypothesis + "\n");
+    tvAudioBuffer.setText(part) ;
     audioBuffer = part ;
     updateResult();
   }
@@ -380,17 +392,19 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
     boolean ret = false ;
     String targetLanguage = "" ;
+    String inputText = "" ;
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
-      Log.e(TAG, "TranslateTask on pre execute");
       targetLanguage = spOutput.getSelectedItem().toString();
+      Log.e(TAG, "TranslateTask on pre execute" + targetLanguage);
+
     }
 
     protected Void doInBackground(String... lines) {
 
 
-      String inputText = lines[0] ;
+      inputText = lines[0] ;
       String prefixPrompt = "Translate into " + targetLanguage + ", do not respond with extra words:" ;
 
       LlamaHelper.shared.cleanTalk();
@@ -398,7 +412,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
 
       try {
-        Thread.sleep(200) ;
+        Thread.sleep(150) ;
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
@@ -412,8 +426,9 @@ public class VoskActivity extends Activity implements RecognitionListener {
       // wait for call next
       translateTask = null ;
 
-      llmTextList.add(llmBuffer + "") ;
-      llmBuffer = null ;
+      llmTextList.add( new Item(inputText, llmBuffer + ""));
+      llmBuffer = "" ;
+      adapter.notifyDataSetChanged();
     }
   }
 }

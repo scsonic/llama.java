@@ -73,15 +73,33 @@
     android:textOff="PAUSE"
     android:textOn="CONTINUE"/>
 
+
+
+  <ListView
+    android:id="@+id/lvListView"
+    android:layout_weight="0.8"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+  </ListView>
+
+
   <TextView
-    android:text="Voice Input:"
+    android:id="@+id/tvAudioBuffer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
   </TextView>
+  <TextView
+    android:text="Voice Input:"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
+  </TextView>
   <TextView
     android:id="@+id/result_text"
+    android:visibility="gone"
     android:layout_weight="0.4"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -91,11 +109,13 @@
 
   <TextView
     android:text="Translate Output:"
+    android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
   </TextView>
   <TextView
+    android:visibility="gone"
     android:id="@+id/tvTranslate"
     android:layout_weight="0.4"
     android:layout_width="match_parent"
