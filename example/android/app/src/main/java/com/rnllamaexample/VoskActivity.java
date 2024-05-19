@@ -75,7 +75,9 @@ public class VoskActivity extends Activity implements RecognitionListener {
   public void onCreate(Bundle state) {
     super.onCreate(state);
     Common.act = this ;
-    LlamaHelper.prePrompt = "Please Translate into English, do not response anything else." ;
+
+
+    LlamaHelper.prePrompt = "your are acting like a speed translator, only translate the input text, and only output translation text with requested language, nothing else";
     setContentView(R.layout.activity_vosk);
 
     // Setup layout
