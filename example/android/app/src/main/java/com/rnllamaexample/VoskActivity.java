@@ -34,7 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -59,6 +59,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
   private SpeechStreamService speechStreamService;
   private TextView resultView;
 
+
   Spinner spInput ;
   Spinner spOutput ;
   Handler mHandler = new Handler() ;
@@ -66,6 +67,8 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
   String audioText = "" ;
   String audioBuffer = "" ;
+  ArrayList<String> audioTextList = new ArrayList<>();
+  ArrayList<String> llmTextList = new ArrayList<>() ;
 
   String llmBuffer = "" ;
   TextView tvTranslate  ;
@@ -88,6 +91,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
       audioBuffer = "" ;
       audioText = "" ;
       llmBuffer = "" ;
+      audioTextList.clear();
       updateResult();
       recognizeMicrophone();
 
@@ -99,7 +103,12 @@ public class VoskActivity extends Activity implements RecognitionListener {
     spInput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.e(TAG, "Change to lang:" + spInput.getSelectedItem().toString()) ;
+        Log.e(TAG, "sp Change to lang:" + spInput.getSelectedItem().toString()) ;
+        if (model != null) {
+          model.close();
+          model = null ;
+        }
+        initModel();
       }
 
       @Override
@@ -114,7 +123,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
     spOutput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        Log.e(TAG, "Convert to lang:" + spInput.getSelectedItem().toString()) ;
+        Log.e(TAG, "sp Convert to lang:" + spOutput.getSelectedItem().toString()) ;
       }
 
       @Override
@@ -170,9 +179,8 @@ public class VoskActivity extends Activity implements RecognitionListener {
     return new BufferedReader(new InputStreamReader(is)).readLine();
   }
   private void initModel() {
-
-    String sourcePath = "model-cn";
-    String targetPath = "test" ;
+    String sourcePath = spInput.getSelectedItem().toString();
+    String targetPath = sourcePath + "Target";
 
     try {
       AssetManager assetManager = this.getAssets();
@@ -238,20 +246,39 @@ public class VoskActivity extends Activity implements RecognitionListener {
     String text = Common.getResult(hypothesis);
     audioText += text;
     llmBuffer += text ;
+
+    if ( text.length() > 0 ) {
+      audioTextList.add(text);
+    }
     audioBuffer = "" ;
     updateResult() ;
 
+
+    // if using full text
+    /*
     if (translateTask == null && llmBuffer.length() > 3){
       translateTask = new TranslateTask();
       String copy = llmBuffer + "" ;
       llmBuffer = "" ;
       translateTask.execute(copy);
     }
+     */
+    if (translateTask == null && audioTextList.size() > 0){
+      try {
+        translateTask = new TranslateTask();
+        String copy = audioTextList.get(0);
+        audioTextList.remove(0);
+        translateTask.execute(copy);
+      }
+      catch (Exception ex){
+        translateTask = null ;
+      }
+    }
   }
 
   @Override
   public void onFinalResult(String hypothesis) {
-    Log.e(TAG, "onFinalResult=" + hypothesis);
+    //Log.e(TAG, "onFinalResult=" + hypothesis);
     onResult(hypothesis);
 
     setUiState(STATE_DONE);
@@ -262,7 +289,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
   @Override
   public void onPartialResult(String hypothesis) {
-    Log.e(TAG, "onPartialResult=" + hypothesis);
+    //Log.e(TAG, "onPartialResult=" + hypothesis);
 
     String part = Common.getResult(hypothesis);
     //resultView.append(hypothesis + "\n");
@@ -348,28 +375,30 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
 
 
+
   class TranslateTask extends AsyncTask<String, Void, Void> {
 
     boolean ret = false ;
+    String targetLanguage = "" ;
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
       Log.e(TAG, "TranslateTask on pre execute");
+      targetLanguage = spOutput.getSelectedItem().toString();
     }
 
     protected Void doInBackground(String... lines) {
 
 
       String inputText = lines[0] ;
-
-      String prefixPrompt = "Translate into English, do not respond with extra words:" ;
+      String prefixPrompt = "Translate into " + targetLanguage + ", do not respond with extra words:" ;
 
       LlamaHelper.shared.cleanTalk();
       ret = LlamaHelper.shared.talkContinue(prefixPrompt + inputText);
 
 
       try {
-        Thread.sleep(100) ;
+        Thread.sleep(200) ;
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
@@ -379,9 +408,12 @@ public class VoskActivity extends Activity implements RecognitionListener {
     @Override
     protected void onPostExecute(Void unused) {
       super.onPostExecute(unused);
-      Log.e(TAG, "Task End, FREE");
+      Log.e(TAG, "Task End, FREE, llmBuffer=" + llmBuffer);
       // wait for call next
       translateTask = null ;
+
+      llmTextList.add(llmBuffer + "") ;
+      llmBuffer = null ;
     }
   }
 }

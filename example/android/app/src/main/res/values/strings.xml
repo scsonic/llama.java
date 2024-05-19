@@ -21,17 +21,17 @@
   <string name="continueRecognition">Continue</string>
 
   <string-array name="InputLang">
-    <item>EN</item>
-    <item>FR</item>
-    <item>CH</item>
+    <item>English</item>
+    <item>French</item>
+    <item>Chinese</item>
   </string-array>
 
   <string-array name="OutputLang">
-    <item>EN</item>
-    <item>FR</item>
-    <item>GE</item>
-    <item>VI</item>
-    <item>CH</item>
-    <item>JP</item>
+    <item>English</item>
+    <item>Vietnamese</item>
+    <item>Japanese</item>
+    <item>German</item>
+    <item>French</item>
+    <item>Chinese</item>
   </string-array>
 </resources>
