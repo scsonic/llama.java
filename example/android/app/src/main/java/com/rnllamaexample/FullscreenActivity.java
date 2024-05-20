@@ -392,24 +392,28 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   public void UIShowBackgroundSelection() {
 
     ArrayList<Integer> itemDrawableList = new ArrayList<>();
-    itemDrawableList.add(R.drawable.back1);
-    itemDrawableList.add(R.drawable.back2);
-    itemDrawableList.add(R.drawable.back3);
-    itemDrawableList.add(R.drawable.back4);
-    itemDrawableList.add(R.drawable.airport);
-    itemDrawableList.add(R.drawable.clinic);
-    itemDrawableList.add(R.drawable.mcdonald);
-    itemDrawableList.add(R.drawable.paris_airport);
+    itemDrawableList.add(R.drawable.adlink);
+    itemDrawableList.add(R.drawable.wallmart);
+    itemDrawableList.add(R.drawable.homedepot);
+    itemDrawableList.add(R.drawable.homedepot2);
+    itemDrawableList.add(R.drawable.airport169);
+    itemDrawableList.add(R.drawable.airport619);
+    itemDrawableList.add(R.drawable.clinic169);
+    itemDrawableList.add(R.drawable.clinic619);
+    itemDrawableList.add(R.drawable.mcdonald169);
+    itemDrawableList.add(R.drawable.mcdonald619);
+    itemDrawableList.add(R.drawable.paris_airport169);
+    itemDrawableList.add(R.drawable.paris_airport619);
 
     ArrayList<String> itemList = new ArrayList<>();
-    itemList.add(getResources().getResourceName(R.drawable.back1));
-    itemList.add(getResources().getResourceName(R.drawable.back2));
-    itemList.add(getResources().getResourceName(R.drawable.back3));
-    itemList.add(getResources().getResourceName(R.drawable.back4));
-    itemList.add(getResources().getResourceName(R.drawable.airport));
-    itemList.add(getResources().getResourceName(R.drawable.clinic));
-    itemList.add(getResources().getResourceName(R.drawable.mcdonald));
-    itemList.add(getResources().getResourceName(R.drawable.paris_airport));
+    for (int drawable: itemDrawableList){
+      String filename = getResources().getResourceName(drawable);
+      int idx = filename.indexOf("/");
+      if (idx > 0){
+        filename = filename.substring(idx+1);
+      }
+      itemList.add(filename);
+    }
 
     // 创建AlertDialog.Builder
     AlertDialog.Builder builder = new AlertDialog.Builder(FullscreenActivity.this);
