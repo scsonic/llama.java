@@ -99,6 +99,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
       audioText = "" ;
       llmBuffer = "" ;
       audioTextList.clear();
+      llmTextList.clear();
       updateResult();
       recognizeMicrophone();
 
@@ -167,6 +168,28 @@ public class VoskActivity extends Activity implements RecognitionListener {
           String text = intent.getStringExtra("token");
           tvTranslate.append(text) ;
           llmBuffer += text ;
+
+          if (translateTask != null) {
+            try {
+              String inputText = translateTask.inputText;
+              // find index:
+              int last_i = -1 ;
+              for (int i = 0 ; i < llmTextList.size() ; i++){
+                Item item = llmTextList.get(i);
+                if (inputText.equalsIgnoreCase(item.getTitle())){
+                  last_i = i ;
+                }
+              }
+              if (last_i != -1 ) {
+                Item item = llmTextList.get(last_i);
+                item.appendSubTitle(text) ;
+                adapter.notifyDataSetChanged();
+              }
+            }
+            catch (Exception ex){
+              Log.e(TAG, "Can't update llm token", ex);
+            }
+          }
 
 //          if ( isAutoScroll) {
 //            final int scrollAmount = tvResponse.getLayout().getLineTop(tvResponse.getLineCount()) - tvResponse.getHeight();
@@ -259,6 +282,9 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
     if ( text.length() > 0 ) {
       audioTextList.add(text);
+      llmTextList.add( new Item(text, ""));
+      adapter.notifyDataSetChanged();
+      lvListView.smoothScrollByOffset(llmTextList.size()-1);
     }
     audioBuffer = "" ;
     updateResult() ;
@@ -391,8 +417,8 @@ public class VoskActivity extends Activity implements RecognitionListener {
   class TranslateTask extends AsyncTask<String, Void, Void> {
 
     boolean ret = false ;
-    String targetLanguage = "" ;
-    String inputText = "" ;
+    public String targetLanguage = "" ;
+    public String inputText = "" ;
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
@@ -426,10 +452,9 @@ public class VoskActivity extends Activity implements RecognitionListener {
       // wait for call next
       translateTask = null ;
 
-      llmTextList.add( new Item(inputText, llmBuffer + ""));
+
       llmBuffer = "" ;
-      adapter.notifyDataSetChanged();
-      lvListView.smoothScrollByOffset(llmTextList.size()-1);
+
     }
   }
 }

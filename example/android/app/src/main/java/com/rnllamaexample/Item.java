@@ -13,6 +13,13 @@ public class Item {
     return title;
   }
 
+  public void appendSubTitle(String str){
+    if (subtitle == null){
+      subtitle = "" ;
+    }
+    subtitle += str ;
+  }
+
   public String getSubtitle() {
     return subtitle;
   }
