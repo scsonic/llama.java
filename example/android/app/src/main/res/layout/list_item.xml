@@ -10,17 +10,15 @@
   <androidx.cardview.widget.CardView
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="8dp"
     app:cardCornerRadius="8dp"
     android:layout_margin="10dp"
-    app:cardBackgroundColor="#FFF"
-    app:cardMaxElevation="2dp"
-    app:cardPreventCornerOverlap="true"
+    app:cardBackgroundColor="#ADD8E6"
     >
 
     <LinearLayout
       android:orientation="vertical"
       android:layout_margin="1dp"
+      android:padding="3dp"
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
       <TextView
@@ -37,9 +35,10 @@
         android:layout_marginHorizontal="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:text="CONTENT AAAA"
-        android:textColor="#666" />
+        android:textStyle="bold"
+        android:textColor="@android:color/holo_blue_dark" />
     </LinearLayout>
   </androidx.cardview.widget.CardView>
 

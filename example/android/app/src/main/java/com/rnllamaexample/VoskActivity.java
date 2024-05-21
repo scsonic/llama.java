@@ -15,6 +15,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -36,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -108,6 +111,12 @@ public class VoskActivity extends Activity implements RecognitionListener {
 
 
     spInput = findViewById(R.id.spInput);
+    // Create an adapter as shown below
+    ArrayAdapter<String> mArrayAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, getResources().getStringArray(R.array.InputLang));
+    mArrayAdapter.setDropDownViewResource(R.layout.spinner_item_dark);
+
+    // Set the adapter to the Spinner
+    spInput.setAdapter(mArrayAdapter);
     spInput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -128,6 +137,11 @@ public class VoskActivity extends Activity implements RecognitionListener {
     tvTranslate = findViewById(R.id.tvTranslate) ;
 
     spOutput = findViewById(R.id.spOutput);
+    ArrayAdapter<String> mArrayAdapter2 = new ArrayAdapter<String>(this, R.layout.spinner_item, getResources().getStringArray(R.array.OutputLang));
+    mArrayAdapter2.setDropDownViewResource(R.layout.spinner_item_dark);
+
+    // Set the adapter to the Spinner
+    spOutput.setAdapter(mArrayAdapter2);
     spOutput.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
       @Override
       public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
