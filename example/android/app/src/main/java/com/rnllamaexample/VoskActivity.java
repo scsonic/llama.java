@@ -429,6 +429,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
       llmTextList.add( new Item(inputText, llmBuffer + ""));
       llmBuffer = "" ;
       adapter.notifyDataSetChanged();
+      lvListView.smoothScrollByOffset(llmTextList.size()-1);
     }
   }
 }
