@@ -53,5 +53,35 @@ public class LlamaRecord {
     }
     return prompt ;
   }
+
+  static public String toPromptLlama3(ArrayList<LlamaRecord> recordList){
+
+//
+//    <|start_header_id|>system<|end_header_id|>
+//    {system_prompt}<|eot_id|>
+//
+//    <|start_header_id|>user<|end_header_id|>
+//    {prompt}<|eot_id|>
+//
+//    <|start_header_id|>assistant<|end_header_id|>
+
+    String prompt = "<|begin_of_text|>" ;
+    String end = "<|eot_id|>\n" ;
+    for (LlamaRecord record: recordList){
+      if (record.role.equalsIgnoreCase(USER)){
+        prompt += "<|start_header_id|>user<|end_header_id|>\n\n" + record.content + end ;
+      }
+      else if (record.role.equalsIgnoreCase(SYSTEM) && record.content.length() > 0){
+        prompt += "<|start_header_id|>system<|end_header_id|>\n\n" + record.content + end ;
+      }
+      else if (record.role.equalsIgnoreCase(ASSISTANT)){
+        prompt += "<|start_header_id|>assistant<|end_header_id|>\n\n" + record.content + end ;
+      }
+      else {
+        //prompt += "<|error:" + record.role + "|>\n" + record.content + end ;
+      }
+    }
+    return prompt ;
+  }
 }
 

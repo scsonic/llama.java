@@ -144,6 +144,11 @@ public class LlamaHelper {
       prompt += "<|" + LlamaRecord.ASSISTANT.toLowerCase() + "|>" ;
       Log.e(TAG, "toPromptPHI3=" + prompt);
     }
+    else if (model_file_name.contains("Llama-3")){
+      prompt = LlamaRecord.toPromptLlama3(talkHistory);
+      prompt += "<|start_header_id|>assistant<|end_header_id|>\n\n";
+      Log.e(TAG, "toPromptLlama3=" + prompt);
+    }
     else {
       // zephyr
       prompt = LlamaRecord.toPromptChatML(talkHistory);
