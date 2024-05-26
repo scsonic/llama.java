@@ -23,6 +23,20 @@
   android:roundIcon="@mipmap/ic_launcher_round"
   android:theme="@style/AppTheme">
 
+
+  <activity
+    android:name="com.rnllamaexample.Llama3Activity"
+    android:configChanges="orientation|keyboardHidden|screenSize"
+    android:exported="true"
+    android:label="Llama3"
+    android:launchMode="singleTask"
+    android:theme="@style/AppTheme.Fullscreen">
+    <intent-filter>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+  </activity>
+
   <activity
     android:name=".VoskActivity"
     android:label="EdgeTranslation"
@@ -34,7 +48,7 @@
       <category android:name="android.intent.category.LAUNCHER" />
     </intent-filter>
   </activity>
-  
+
   <activity
     android:name=".ShellActivity"
     android:exported="false" />
@@ -64,6 +78,9 @@
       <category android:name="android.intent.category.LAUNCHER" />
     </intent-filter>
   </activity>
+
+
+
 
   <activity
     android:name=".MainActivity"

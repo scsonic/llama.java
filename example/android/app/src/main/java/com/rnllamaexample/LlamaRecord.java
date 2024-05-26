@@ -72,7 +72,7 @@ public class LlamaRecord {
         prompt += "<|start_header_id|>user<|end_header_id|>\n\n" + record.content + end ;
       }
       else if (record.role.equalsIgnoreCase(SYSTEM) && record.content.length() > 0){
-        prompt += "<|start_header_id|>system<|end_header_id|>\n\n" + record.content + end ;
+        prompt += "<|start_header_id|>system<|end_header_id|>\n\n" + record.content + ". don't use emojis."+ end ;
       }
       else if (record.role.equalsIgnoreCase(ASSISTANT)){
         prompt += "<|start_header_id|>assistant<|end_header_id|>\n\n" + record.content + end ;

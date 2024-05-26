@@ -143,7 +143,7 @@ public class LlamaContext {
 //      }
 //    }
 
-    String[] stops = {"</s>", "<|end|>", "<|user|>", "\n**", "\n##", "<|end", "<|end_of_text|>"};
+    String[] stops = {"</s>", "<|end|>", "<|user|>", "\n**", "\n##", "<|end", "<|end_of_text|>", "<|eot_id|>"};
 
     return doCompletion(
       this.context,
