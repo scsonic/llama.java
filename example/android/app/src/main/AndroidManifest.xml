@@ -24,30 +24,6 @@
   android:theme="@style/AppTheme">
 
 
-  <activity
-    android:name="com.rnllamaexample.Llama3Activity"
-    android:configChanges="orientation|keyboardHidden|screenSize"
-    android:exported="true"
-    android:label="Llama3"
-    android:launchMode="singleTask"
-    android:theme="@style/AppTheme.Fullscreen">
-    <intent-filter>
-      <action android:name="android.intent.action.MAIN" />
-      <category android:name="android.intent.category.LAUNCHER" />
-    </intent-filter>
-  </activity>
-
-  <activity
-    android:name=".VoskActivity"
-    android:label="EdgeTranslation"
-    android:launchMode="singleTask"
-    android:exported="true" >
-    <intent-filter>
-      <action android:name="android.intent.action.MAIN" />
-
-      <category android:name="android.intent.category.LAUNCHER" />
-    </intent-filter>
-  </activity>
 
   <activity
     android:name=".ShellActivity"
@@ -88,6 +64,32 @@
     android:exported="false"
     android:label="HIDE"
     android:windowSoftInputMode="adjustResize">
+  </activity>
+
+
+  <activity
+    android:name="com.rnllamaexample.Llama3Activity"
+    android:configChanges="orientation|keyboardHidden|screenSize"
+    android:exported="true"
+    android:label="Llama3"
+    android:launchMode="singleTask"
+    android:theme="@style/AppTheme.Fullscreen">
+    <intent-filter>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+  </activity>
+
+  <activity
+    android:name=".VoskActivity"
+    android:label="EdgeTranslation"
+    android:launchMode="singleTask"
+    android:exported="true" >
+    <intent-filter>
+      <action android:name="android.intent.action.MAIN" />
+
+      <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
   </activity>
 
 </application>

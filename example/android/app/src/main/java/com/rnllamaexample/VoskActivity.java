@@ -447,11 +447,13 @@ public class VoskActivity extends Activity implements RecognitionListener {
       inputText = lines[0] ;
       String prefixPrompt = "Translate into " + targetLanguage + ", do not respond with extra words:" ;
 
-      LlamaHelper.shared.cleanTalk();
-      ret = LlamaHelper.shared.talkContinue(prefixPrompt + inputText);
 
 
       try {
+        LlamaHelper.shared.cleanTalk();
+        ret = LlamaHelper.shared.talkContinue(prefixPrompt + inputText);
+
+
         Thread.sleep(150) ;
       } catch (InterruptedException e) {
         throw new RuntimeException(e);

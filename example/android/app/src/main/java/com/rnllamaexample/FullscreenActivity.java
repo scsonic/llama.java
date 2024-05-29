@@ -392,7 +392,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
   public void UIShowBackgroundSelection() {
 
     ArrayList<Integer> itemDrawableList = new ArrayList<>();
-    itemDrawableList.add(R.drawable.adlink);
+    itemDrawableList.add(R.drawable.adlink169);
+    itemDrawableList.add(R.drawable.adlink916);
     itemDrawableList.add(R.drawable.wallmart);
     itemDrawableList.add(R.drawable.homedepot);
     itemDrawableList.add(R.drawable.homedepot2);
