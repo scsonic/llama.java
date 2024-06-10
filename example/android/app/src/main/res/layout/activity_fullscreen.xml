@@ -162,8 +162,18 @@
     android:background="#00000000"
     android:src="@drawable/baseline_more_horiz_24"
     android:layout_alignParentRight="true"
-    android:layout_width="50dp"
-    android:layout_height="50dp">
+    android:layout_width="75dp"
+    android:layout_height="75dp">
+
+  </ImageButton>
+
+  <ImageButton
+    android:id="@+id/btnMoreLeft"
+    android:background="#00000000"
+    android:src="@drawable/baseline_more_horiz_24"
+    android:layout_alignParentLeft="true"
+    android:layout_width="75dp"
+    android:layout_height="75dp">
 
   </ImageButton>
 </RelativeLayout>

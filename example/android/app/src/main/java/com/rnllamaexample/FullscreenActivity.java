@@ -68,6 +68,7 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
     EditText etInput ;
     ProgressBar pbLoading;
   ImageButton btnMore;
+  ImageButton btnMoreLeft ;
 
   MaterialButtonToggleGroup mbtgLang;
   MaterialButton btnLang0 ;
@@ -533,6 +534,8 @@ public class FullscreenActivity extends AppCompatActivity implements IAvatarPlay
 //      });
 
       btnMore.setOnClickListener( onMorePress );
+    btnMoreLeft = findViewById(R.id.btnMoreLeft) ;
+      btnMoreLeft.setOnClickListener( onMorePress );
 
          new Thread(){
            @Override
